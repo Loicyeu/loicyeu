@@ -1,21 +1,115 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="stylesheets/index.css">
-    <title>Loicyeu</title>
-</head>
-<!--  https://coolors.co/1c1c1c-7a7d7d-d0cfcf-eef0f2-fafaff  -->
-<body>
-    
-<div id="sidenav">
-    <p>Sidenav</p>
-</div>
-    
-<div id="main">
-    <p>main</p>
-</div>
 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <title>Le projet</title>
+</head>
+
+<body class="bg-brilliantAzure">
+    <div>
+    <!--NAVBAR-->
+    <nav class="navbar navbar-expand-sm bg-darkSapphire navbar-dark fixed-top">
+        <a class="navbar-brand font-weight-bold" href="#">Le Projet</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Boite mail</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        Messagerie
+                        <span class="badge badge-primary">+7</span>
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        Profil
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">
+                            <i class="far fa-user-circle"></i>
+                            Mes informations
+                        </a>
+                        <a class="dropdown-item" href="#">
+                            <i class="fas fa-cog"></i>
+                            Préférences
+                            </i>
+                        </a>
+                        <a class="dropdown-item" href="#">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!--CONTENT-->
+    <div class="container-fluid bg-duplain" style="margin-top:80px">
+        <div class="row">
+            <div class="col-sm-2 bg-azraqBlue">
+                <h3 class="text-light mt-2">Contacts</h3>
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link text-light " href="#">
+                            <img class="rounded-circle border align-middle" src="user.webp" alt="user pic" width="25" height="25">
+                            Contact n°1 
+                            <span class="badge badge-danger">5</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="#">
+                            <img class="rounded-circle border align-middle" src="user.webp" alt="user pic" width="25" height="25">
+                            Contact n°2
+                            <span class="badge badge-danger">2</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="#">
+                            <img class="rounded-circle border align-middle" src="user.webp" alt="user pic" width="25" height="25">
+                            Contact n°3
+                        </a>
+                    </li>
+                </ul>
+                <hr class="d-sm-none">
+            </div>
+            <div class="col-sm-10 bg-azraqBlue rounded-lg">
+                <h3 class="mt-2">Contact n°1</h3>
+                <div class="bg-light rounded" style="height: 70vh;">
+                    <div class="text-left m-1">
+                        <p class="d-inline-block bg-flatFlesh rounded p-1">Hello</p>
+                    </div>
+                    <div class="text-right m-1">
+                        <p class="d-inline-block bg-icelandPoppy rounded p-1">Hello</p>
+                    </div>
+                    <div class="text-left m-1">
+                        <p class="d-inline-block bg-flatFlesh rounded p-1">How are you today ?</p>
+                    </div>
+                    <div class="text-left m-1">
+                        <p class="d-inline-block bg-flatFlesh rounded p-1">Because it's rainy today</p>
+                    </div>
+                    <div class="text-right m-1">
+                        <p class="d-inline-block bg-icelandPoppy rounded p-1">Good, and you ?</p>
+                    </div>
+                </div>
+                <input type="text" class="form-control my-2" placeholder="Envoyer un message...">
+            </div>
+        </div>
+    </div>
+</div>
 </body>
+
 </html>
