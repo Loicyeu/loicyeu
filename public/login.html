@@ -6,13 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="express-sendfile/stylesheets/style.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script src="express-sendfile/scripts/forms.js"></script>
+    <script src="scripts/forms.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+    </script>
     <title>Le projet</title>
 </head>
 
@@ -44,7 +48,7 @@
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary btn-block"> Se connecter  </button>
                 </div>
-                <p class="text-center"><a href="express-sendfile/register.html" class="btn">Créer un compte ?</a></p>
+                <p class="text-center"><a href="register.html" class="btn">Créer un compte ?</a></p>
                 </form>
             </article>
         </div>

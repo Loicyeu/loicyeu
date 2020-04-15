@@ -1,8 +1,14 @@
 const express = require('express');
-const app = express();
-const path = require('path');
+const app = require('express')();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 
-// viewed at http://localhost:8080
-
-app.listen(8080);
 app.use(express.static('public'))
+
+io.on('connection', (socket) => {
+    console.log('user connected');
+});
+
+http.listen(3000, () => {
+    console.log('listening on *:3000');
+});
