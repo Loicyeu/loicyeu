@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="scripts/forms.js"></script>
+    <script src="scripts/index.js"></script>
+    <title>Le projet</title>
+</head>
+
+<body class="bg-brilliantAzure">
+    <div class="container-fluid p-0">
+        <div class="d-flex align-items-center justify-content-center" style="height: 100vh; width: 100vw;">
+            <article class="bg-white rounded w-25 m-auto p-4">
+                <h4 class="card-title text-center mb-4 mt-1">Création compte</h4>
+                <hr>
+                <div class="alert alert-danger">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong>Attention : </strong>les mots de passes ne sont pas protégés pour le moment. Création du compte a vos risques.
+                </div>
+                <div id="alertRegister"></div>
+
+                <form onsubmit="return formRegister()">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"> <i class="fas fa-user"></i> </span>
+                            </div>
+                            <input id="prenom" class="form-control" type="text" placeholder="Prénom">
+                            <input id="nom" class="form-control" type="text" placeholder="Nom">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"> <i class="fas fa-at"></i> </span>
+                            </div>
+                            <input id="email" class="form-control" type="email" placeholder="Adresse email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"> <i class="fas fa-lock"></i> </span>
+                            </div>
+                            <input id="mdp1" class="form-control" type="password" placeholder="Mot de passe">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"> <i class="fas fa-lock"></i> </span>
+                            </div>
+                            <input id="mdp2" class="form-control" type="password" placeholder="Confirmation du mot de passe">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block"> Créer le compte  </button>
+                    </div>
+                    <p class="text-center"><a href="login.html" class="btn">Se connecter ?</a></p>
+                </form>
+            </article>
+        </div>
+    </div>
+</body>
