@@ -8,14 +8,16 @@ function formRegister() {
 
     if(email!=="" && nom!=="" && prenom!=="" && mdp1!=="" && mdp2!=="") {
         if(regexEmail.test(email)){
-            if(mdp1.match(/[0-9]/)>=2 && mdp1.match(/[A-Z]/)>=2 && mdp1.match(/[a-z]/)>=2){
-                if(mdp1===mdp2) {
-                    console.log("registerUser");
-                    return registerUser(nom, prenom, mdp1, email);
-                }else setAlert("alertRegister", "les mots de passes ne sont pas identiques", "Erreur :", "warning");
+            if (mdp1.match(/[0-9]/g)!==null && mdp1.match(/[A-Z]/g)!==null && mdp1.match(/[a-z]/g)!==null){
+                if(mdp1.match(/[0-9]/g).length>=2 && mdp1.match(/[A-Z]/g).length>=2 && mdp1.match(/[a-z]/g).length>=2 && mdp1.length>=8){
+                    if(mdp1===mdp2) {
+                        console.log("register User");
+                        registerUser(nom, prenom, mdp1, email);
+                    }else setAlert("alertRegister", "les mots de passes ne sont pas identiques", "Erreur :", "warning");
+                }else setAlert("alertRegister", "le mot de passe n'est pas valide", "Erreur :", "warning");
             }else setAlert("alertRegister", "le mot de passe n'est pas valide", "Erreur :", "warning");
         }else setAlert("alertRegister", "l'adresse email est invalide", "Erreur :", "warning");
-    } else setAlert("alertRegister", "l'un des champs ne peut pas être vide", "Erreur :", "warning");
+    }else setAlert("alertRegister", "l'un des champs ne peut pas être vide", "Erreur :", "warning");
     return false;
 }
 
@@ -57,7 +59,8 @@ function testPassword1() {
     let iconMdp1 = document.getElementById("iconPassword1");
 
     if(mdp==="") iconMdp1.className = "input-group-text text-danger";
-    else if(mdp.match(passNumber)<2 || mdp.match(passUppercase)<2 || mdp.match(passLowercase)<2) iconMdp1.className = "input-group-text text-warning"
+    else if(mdp.match(passNumber)===null || mdp.match(passUppercase)===null || mdp.match(passLowercase)===null) iconMdp1.className = "input-group-text text-warning"
+    else if(mdp.match(passNumber).length<2 || mdp.match(passUppercase).length<2 || mdp.match(passLowercase).length<2) iconMdp1.className = "input-group-text text-warning"
     else if(mdp.length>=8) iconMdp1.className = "input-group-text text-success"
 }
 
