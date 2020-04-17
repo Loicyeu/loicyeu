@@ -2,7 +2,11 @@ const express = require('express');
 const app = express();
 const fs = require('fs');
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+/*const https = require('https').createServer({
+    key: fs.readFileSync("privkey.pem"),
+    cert: fs.readFileSync("fullchain.pem")
+},app);*/
+const io = require('socket.io')(http); //(https)
 const mysql = require('mysql');
 const nodemailer = require('nodemailer');
 
@@ -18,6 +22,7 @@ con.connect(function(err) {
     createTables();
 });
 
+//ça saute !
 http.listen(3000, () => {
     console.log('listening on :3000');
 });
