@@ -1,0 +1,16 @@
+{
+  "name": "loicyeu",
+  "description": "Le site loicyeu.fr",
+  "version": "1.0.0",
+  "author": "Loïc HENRY",
+  "dependencies": {
+    "socket.io": "^2.3.0",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "socket.io": "^2.3.0",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1"
+  }
+}
