@@ -8,7 +8,7 @@ const http = require('http').createServer(app);
 },app);*/
 const io = require('socket.io')(http); //(https)
 const mysql = require('mysql');
-const nodemailer = require('nodemailer');
+const uuid = require('uuid');
 
 const con = mysql.createConnection({
     host: "localhost",
@@ -28,61 +28,62 @@ http.listen(3000, () => {
 });
 app.use(express.static('public'));
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'loicyeu@gmail.com',
-        pass: '5!x8Df{4vD'
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
-
 /*
 * FONCTIONS
 * */
 
 function createDB() {
     con.query("CREATE DATABASE loicyeufr", function (err, result) {
-        if (err.code !== "ER_DB_CREATE_EXISTS") throw err.code && err;
-        console.log("Database created");
+        if(err) {
+            if (err.code !== "ER_DB_CREATE_EXISTS") sqlError(err);
+            else sqlWarning(err);
+        } else sqlInfo("Database created");
     });
 }
 
 function createTables() {
-    var sql = "CREATE TABLE utilisateur (id INT AUTO_INCREMENT PRIMARY KEY, nom VARCHAR(255), prenom VARCHAR(255), mdp VARCHAR(255), email VARCHAR(255))";
-    con.query(sql, function (err, result) {
-        if (err.code === "ER_TABLE_EXISTS_ERROR") console.log("La table utilisateur existe deja !");
-        else if(err) throw err.code && err;
-        else console.log("Table created");
+    let sql = "CREATE TABLE utilisateur (id INT AUTO_INCREMENT PRIMARY KEY, nom VARCHAR(255), prenom VARCHAR(255), mdp VARCHAR(255), email VARCHAR(255))";
+    con.query(sql, function (err) {
+        if(err) {
+            if (err.code === "ER_TABLE_EXISTS_ERROR") sqlWarning(err);
+            else sqlError(err);
+        } else sqlInfo("Table 'utilisateur' created");
+    });
+    sql = "CREATE TABLE uuid (user INT, uuid VARCHAR(255), expires BIGINT, PRIMARY KEY (user), FOREIGN KEY (user) REFERENCES utilisateur(id) ON DELETE CASCADE)"
+    con.query(sql, function (err) {
+        if(err) {
+            if (err.code === "ER_TABLE_EXISTS_ERROR") sqlWarning(err);
+            else sqlError(err);
+        } else sqlInfo("Table 'uuid' created");
     });
 }
 
-function sendMail(to, subject, content) {
-    const regexEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!regexEmail.test(to)) return;
-
-    const mailOption = {
-        to: to,
-        subject: subject,
-        text: content
-    }
-
-    transporter.sendMail(mailOption, function (err, info) {
-        if (err) console.log(err);
-        else console.log('Email sent: ' + info.response);
-    })
+function sqlError(err) {
+    console.log("[SQL ERROR] Code    : "+err.code
+        + "\n[SQL ERROR] Message : " + err.sqlMessage);
 }
 
+function sqlWarning(err) {
+    console.log("[SQL WARNING] Code    : " + err.code
+        + "\n[SQL WARNING] Message : " + err.sqlMessage);
+}
+
+function sqlInfo(info) {
+    console.log("[SQL INFO] " + info);
+}
+
+function consoleInfo(info) {
+    console.log("[GENERAL INFO] " + info);
+}
 /*
 * FONCTIONS SOCKET
 * */
 
 io.on('connection', (socket) => {
-    console.log('user connected');
+    //console.log('user connected');
 
-    //res (bool) err (String)
+    //res {uuid, expires}
+    //err (String)
     socket.on('loginUser', function (email, mdp, callback) {
         if(callback === null) return;
         if(email === null || mdp === null) {
@@ -91,8 +92,27 @@ io.on('connection', (socket) => {
         }
         const sql = "SELECT id FROM utilisateur WHERE email = \""+ email + "\" AND mdp = \"" + mdp + "\"";
         con.query(sql, function (err, result) {
-            if(result.length === 1) callback(true, null);
-            if(result.length > 1) callback(false, "Plusieurs entrées identiques. Connection refusé");
+            if(err) sqlError(err);
+            else if(result.length === 1) {
+                con.query("DELETE FROM uuid WHERE user=" + result[0].id, function (err) {
+                    if(err) sqlError(err);
+                    else {
+                        const userUUID = uuid.v4();
+                        const expires = Date.now() + 14400000;
+                        const sql = "INSERT INTO uuid (user, uuid, expires) VALUES (" + result[0].id + ", \"" + userUUID + "\", " + expires + ")";
+                        con.query(sql, function (err) {
+                            if (err) sqlError(err);
+                            else {
+                                callback({
+                                    uuid: userUUID,
+                                    expires: expires
+                                }, null);
+                                consoleInfo("Connected user with uuid : " + userUUID + " and expire date : " + expires);
+                            }
+                        });
+                    }
+                });
+            }else if(result.length > 1) callback(false, "Plusieurs entrées identiques. Connection refusé");
             else callback(false, "Mauvais identifiant / mot de passe");
         });
     });
@@ -112,14 +132,46 @@ io.on('connection', (socket) => {
         }
         const sql = "SELECT id FROM utilisateur WHERE email = \"" + email + "\"";
         con.query(sql, function (err, result) {
-            if(result.length === 0) {
+            if(err) sqlError(err);
+            else if(result.length === 0) {
                 const sql2 = "INSERT INTO utilisateur(nom, prenom, mdp, email) VALUES (\"" + nom + "\", \"" + prenom + "\", \"" + mdp + "\", \"" + email +"\")";
-                con.query(sql2, function (err, result) {
-                    if(err) throw err;
-                    callback(true, null);
+                con.query(sql2, function (err) {
+                    if(err) sqlError(err);
+                    else callback(true, null);
                 });
             }else{
                 callback(false, "Adresse email déjà présente dans la base de données");
+            }
+        });
+    });
+
+    //res (bool) err (String)
+    socket.on('isConnected', function (uuid, callback) {
+        if(callback===null) return;
+        if(uuid===null) {
+            callback(false, "Empty UUID");
+            return;
+        }
+        const sql = "SELECT * FROM uuid WHERE uuid=\"" + uuid + "\""
+        con.query(sql, function (err, result) {
+            if(err) sqlError(err);
+            else {
+                if(result.length===0) {
+                    callback(false, "ERR_NO_SESSION_FOUND");
+                    consoleInfo("ERR_NO_SESSION_FOUND");
+                }else if(result[0].expires<Date.now()){
+                    callback(false, "ERR_EXPIRED_SESSION");
+                    consoleInfo("ERR_EXPIRED_SESSION");
+                    con.query("DELETE FROM uuid WHERE user=" + result[0].user, (err) => {
+                        if(err) sqlError(err);
+                    });
+                }else if(result[0].expires>Date.now()){
+                    callback(true, null);
+                    consoleInfo("Connected user with uuid : " + uuid);
+                }else{
+                    callback(false, "ERR_UNEXPECTED_ERROR")
+                    consoleInfo("ERR_UNEXPECTED_ERROR");
+                }
             }
         });
     });

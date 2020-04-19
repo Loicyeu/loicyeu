@@ -17,9 +17,11 @@ function formLogin() {
 function loginUser(email, pass) {
     delAlert("alertLogin");
     socket.emit("loginUser", email, pass, function (res, err) {
-        if(err===null) setAlert("alertLogin", "Connexion réussit !", "", "success");
+        if(err===null) {
+            setCookie("uuid",res.uuid,res.expires);
+            window.location.replace("./messagerie.html");
+        }
         else setAlert("alertLogin", err, "", "warning");
     });
-    //setAlert("alertLogin", "L'email / mot de passe est invalide", "", "danger");
     return false;
 }
