@@ -15,6 +15,8 @@ function formLogin() {
 }
 
 function loginUser(email, pass) {
+    let loginButton = document.getElementById("loginButton");
+    loginButton.innerHTML = "<span class='spinner-border spinner-border-sm'></span> Chargement...";
     delAlert("alertLogin");
     socket.emit("loginUser", email, pass, function (res, err) {
         if(err===null) {
@@ -22,6 +24,7 @@ function loginUser(email, pass) {
             window.location.replace("./messagerie.html");
         }
         else setAlert("alertLogin", err, "", "warning");
+        loginButton.innerHTML = "Se connecter";
     });
     return false;
 }

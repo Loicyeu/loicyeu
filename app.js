@@ -28,6 +28,11 @@ http.listen(3000, () => {
 });
 app.use(express.static('public'));
 
+/*TODO
+*  - password hash
+* */
+
+
 /*
 * FONCTIONS
 * */
