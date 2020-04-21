@@ -22,16 +22,24 @@ con.connect(function(err) {
     createTables();
 });
 
-//ça saute !
+//https
 http.listen(3000, () => {
-    console.log('listening on :3000');
+    console.log('listening on port : 3000');
 });
 app.use(express.static('public'));
+
+/*TODO
+*  - password hash
+*  - gestion d'acces des pages Express
+*  - Modification profil
+* */
+
 
 /*
 * FONCTIONS
 * */
 
+//Database functions
 function createDB() {
     con.query("CREATE DATABASE loicyeufr", function (err, result) {
         if(err) {
@@ -40,7 +48,6 @@ function createDB() {
         } else sqlInfo("Database created");
     });
 }
-
 function createTables() {
     let sql = "CREATE TABLE utilisateur (id INT AUTO_INCREMENT PRIMARY KEY, nom VARCHAR(255), prenom VARCHAR(255), mdp VARCHAR(255), email VARCHAR(255))";
     con.query(sql, function (err) {
@@ -58,23 +65,31 @@ function createTables() {
     });
 }
 
+//SQL information functions
 function sqlError(err) {
     console.log("[SQL ERROR] Code    : "+err.code
         + "\n[SQL ERROR] Message : " + err.sqlMessage);
 }
-
 function sqlWarning(err) {
     console.log("[SQL WARNING] Code    : " + err.code
         + "\n[SQL WARNING] Message : " + err.sqlMessage);
 }
-
 function sqlInfo(info) {
     console.log("[SQL INFO] " + info);
 }
 
+//Global information functions
 function consoleInfo(info) {
     console.log("[GENERAL INFO] " + info);
 }
+
+//
+function changeFile() {
+    app.use(express.static('public'));
+}
+
+
+
 /*
 * FONCTIONS SOCKET
 * */
@@ -82,8 +97,7 @@ function consoleInfo(info) {
 io.on('connection', (socket) => {
     //console.log('user connected');
 
-    //res {uuid, expires}
-    //err (String)
+    //res {uuid, expires} err (String)
     socket.on('loginUser', function (email, mdp, callback) {
         if(callback === null) return;
         if(email === null || mdp === null) {
@@ -108,6 +122,7 @@ io.on('connection', (socket) => {
                                     expires: expires
                                 }, null);
                                 consoleInfo("Connected user with uuid : " + userUUID + " and expire date : " + expires);
+                                changeFile();
                             }
                         });
                     }
