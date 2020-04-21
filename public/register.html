@@ -16,26 +16,17 @@
 
     <script src="scripts/register.js"></script>
     <script src="scripts/global.js"></script>
-    <title>Le projet</title>
+    <title>Enregistrement | loicyeu.fr</title>
 </head>
 
 <body class="bg-brilliantAzure">
     <div class="container-fluid p-0">
         <div class="d-flex align-items-center justify-content-center" style="height: 100vh; width: 100vw;">
-            <article class="bg-white rounded w-25 m-auto p-4">
+            <article class="bg-white rounded w-50 m-auto p-4">
                 <h4 class="card-title text-center mb-4 mt-1">Création compte</h4>
                 <hr>
                 <div class="alert alert-danger">
                     <strong>Attention : </strong>les mots de passes ne sont pas protégés pour le moment. Création du compte a vos risques.
-                </div>
-                <div class="alert alert-info">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <strong>Info : </strong>le mot de passe doit contenir au moins 8 caractères dont :
-                    <ul class="mb-0">
-                        <li>2 chiffres</li>
-                        <li>2 minuscules</li>
-                        <li>2 majucules</li>
-                    </ul>
                 </div>
                 <div id="alertRegister"></div>
 
@@ -64,6 +55,9 @@
                             </div>
                             <input id="password1" class="form-control" type="password" placeholder="Mot de passe" onkeyup="testPassword1()">
                         </div>
+                        <small class="form-text text-muted">
+                            Votre mot de passe doit contenir au moins 8 caractères dont au moins 2 chiffres, 2 majuscules et 2 minuscules.
+                        </small>
                     </div>
                     <div class="form-group">
                         <div class="input-group">

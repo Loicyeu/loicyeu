@@ -31,6 +31,7 @@ app.use(express.static('public'));
 /*TODO
 *  - password hash
 *  - gestion d'acces des pages Express
+*  - Modification profil
 * */
 
 
