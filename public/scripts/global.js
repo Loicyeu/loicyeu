@@ -36,11 +36,31 @@ function getCookie(cname) {
     return null;
 }
 
-function isConnected() {
+function getURLParam(param) {
+    return new URLSearchParams(window.location.search).get(param);
+}
+
+function isConnected(callback) {
     const uuid = getCookie("uuid");
     if(uuid === null) return false;
-    return socket.emit("isConnected", uuid, function (res, err) {
-        console.log(err);
-        return res;
+    socket.emit("isConnected", uuid, function (res, err) {
+        callback(res);
     });
+}
+
+function testPassword(password) {
+    const passNumber = new RegExp("[0-9]", "g");
+    const passUppercase = new RegExp("[A-Z]", "g");
+    const passLowercase = new RegExp("[a-z]", "g");
+
+    if(password==="") return {res: false, err: "ERR_PASSWORD_EMPTY"};
+    else if(password.match(passNumber)===null || password.match(passUppercase)===null || password.match(passLowercase)===null) return {res: false, err: "ERR_PASSWORD_INVALID"};
+    else if(password.match(passNumber).length<2 || password.match(passUppercase).length<2 || password.match(passLowercase).length<2) return {res: false, err: "ERR_PASSWORD_INVALID"};
+    else if(password.length<8) return {res: false, err: "ERR_PASSWORD_TOO_SHORT"}
+    else return {res: true, err: null}
+}
+
+function disconnect() {
+    setCookie("uuid", null);
+    window.location.replace("index.html");
 }

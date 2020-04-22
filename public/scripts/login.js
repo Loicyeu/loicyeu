@@ -1,7 +1,11 @@
+/*FONCTIONS*/
+
 function formLogin() {
     const email = document.getElementById("email").value;
     const pass = document.getElementById("password").value;
     const regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+    delAlert("alertAccountCreated");
 
     if(pass!=="") {
         if(email!==""){
@@ -21,7 +25,7 @@ function loginUser(email, pass) {
     socket.emit("loginUser", email, pass, function (res, err) {
         if(err===null) {
             setCookie("uuid",res.uuid,res.expires);
-            window.location.replace("./messagerie.html");
+            window.location.replace("./index.html");
         }
         else setAlert("alertLogin", err, "", "warning");
         loginButton.innerHTML = "Se connecter";
