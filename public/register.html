@@ -14,7 +14,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 
-    <script src="scripts/register.js"></script>
+    <script src="scripts/register.js" defer></script>
     <script src="scripts/global.js"></script>
     <title>Enregistrement | loicyeu.fr</title>
 </head>
@@ -22,11 +22,11 @@
 <body class="bg-brilliantAzure">
     <div class="container-fluid p-0">
         <div class="d-flex align-items-center justify-content-center" style="height: 100vh; width: 100vw;">
-            <article class="bg-white rounded w-50 m-auto p-4">
+            <article class="bg-white rounded container m-auto p-4">
                 <h4 class="card-title text-center mb-4 mt-1">Création compte</h4>
                 <hr>
-                <div class="alert alert-danger">
-                    <strong>Attention : </strong>les mots de passes ne sont pas protégés pour le moment. Création du compte a vos risques.
+                <div class="alert alert-info">
+                    <strong>Information : </strong>les mots de passe sont désormais protégé (SHA-1).
                 </div>
                 <div id="alertRegister"></div>
 
@@ -70,7 +70,7 @@
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block"> Créer le compte </button>
                     </div>
-                    <p class="text-center"><a href="index.html" class="btn">Se connecter ?</a></p>
+                    <p class="text-center"><a href="login.html" class="btn">Se connecter ?</a></p>
                 </form>
             </article>
         </div>

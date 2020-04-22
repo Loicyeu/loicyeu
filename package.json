@@ -4,6 +4,8 @@
   "version": "1.0.0",
   "author": "Loïc HENRY",
   "dependencies": {
+    "node-gyp": "^6.1.0",
+    "bcrypt": "^4.0.1",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "mysql": "^2.18.1",

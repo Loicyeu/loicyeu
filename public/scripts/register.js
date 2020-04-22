@@ -1,4 +1,5 @@
 function formRegister() {
+    console.log("form register")
     const regexEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
     const email = document.getElementById("email").value;
     const nom = document.getElementById("nom").value;
@@ -22,11 +23,15 @@ function formRegister() {
 }
 
 function registerUser(nom, prenom, mdp, email) {
+    console.log("create profile")
     delAlert("alertRegister");
     socket.emit("registerUser", nom, prenom, mdp, email, function (res, err) {
-        if(err===null) setAlert("alertRegister", "Création réussit !", "", "success");
+        if(res) {
+            setAlert("alertRegister", "Création du compte réussit !\nRedirection dans 5 secondes", "Félicitation : ", "success");
+            setTimeout(()=>window.location.replace("login.html"),5000);
+        }
         else setAlert("alertRegister", err, "Erreur :", "warning");
-    })
+    });
     return false;
 }
 
@@ -59,9 +64,9 @@ function testPassword1() {
     let iconMdp1 = document.getElementById("iconPassword1");
 
     if(mdp==="") iconMdp1.className = "input-group-text text-danger";
-    else if(mdp.match(passNumber)===null || mdp.match(passUppercase)===null || mdp.match(passLowercase)===null) iconMdp1.className = "input-group-text text-warning"
-    else if(mdp.match(passNumber).length<2 || mdp.match(passUppercase).length<2 || mdp.match(passLowercase).length<2) iconMdp1.className = "input-group-text text-warning"
-    else if(mdp.length>=8) iconMdp1.className = "input-group-text text-success"
+    else if(mdp.match(passNumber)===null || mdp.match(passUppercase)===null || mdp.match(passLowercase)===null) iconMdp1.className = "input-group-text text-warning";
+    else if(mdp.match(passNumber).length<2 || mdp.match(passUppercase).length<2 || mdp.match(passLowercase).length<2) iconMdp1.className = "input-group-text text-warning";
+    else if(mdp.length>=8) iconMdp1.className = "input-group-text text-success";
 }
 
 function testPassword2() {
