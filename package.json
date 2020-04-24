@@ -7,5 +7,8 @@
     "type": "git",
     "url": "git+https://github.com/Loicyeu/loicyeu.git"
   },
-  "author": "loicyeu"
+  "author": "loicyeu",
+  "dependencies": {
+    "socket.io": "^2.3.0"
+  }
 }
