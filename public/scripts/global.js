@@ -5,10 +5,9 @@ function setAlert(id, msg, title="", color="secondary") {
 
     delAlert(id)
     document.getElementById(id).className += "alert alert-" + color;
-    document.getElementById(id).innerHTML += "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button><strong>"+ title +"</strong> " + msg;
+    document.getElementById(id).innerHTML += "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button><strong>"+ title +" : </strong>" + msg;
 
 }
-
 function delAlert(id) {
     if(id==="") return;
     document.getElementById(id).className = "";
@@ -23,7 +22,6 @@ function setCookie(name, value, timestamp=null) {
         document.cookie = name + "=" + value
     }
 }
-
 function getCookie(cname) {
     const name = cname + "=";
     const decodedCookie = decodeURIComponent(document.cookie);
@@ -47,6 +45,10 @@ function isConnected(callback) {
         callback(res);
     });
 }
+function disconnect() {
+    setCookie("uuid", null);
+    window.location.replace("login.html");
+}
 
 function testPassword(password) {
     const passNumber = new RegExp("[0-9]", "g");
@@ -58,9 +60,4 @@ function testPassword(password) {
     else if(password.match(passNumber).length<2 || password.match(passUppercase).length<2 || password.match(passLowercase).length<2) return {res: false, err: "ERR_PASSWORD_INVALID"};
     else if(password.length<8) return {res: false, err: "ERR_PASSWORD_TOO_SHORT"}
     else return {res: true, err: null}
-}
-
-function disconnect() {
-    setCookie("uuid", null);
-    window.location.replace("index.html");
 }
