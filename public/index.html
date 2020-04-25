@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="stylesheets/style.css">
+    <link rel="stylesheet" href="stylesheets/global.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -14,13 +14,12 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 
+    <script src="scripts/index.js" defer></script>
     <script src="scripts/global.js"></script>
-    <script src="scripts/index.js"></script>
     <title>Message | loicyeu.fr</title>
 </head>
-
 <body class="bg-brilliantAzure">
-    <div>
+<div>
     <!--NAVBAR-->
     <nav class="navbar navbar-expand-sm bg-darkSapphire navbar-dark sticky-top">
         <a class="navbar-brand font-weight-bold" href="https://loicyeu.fr">loicyeu.fr</a>
@@ -28,7 +27,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
                     <a class="nav-link" href="#">
                         Messagerie
@@ -40,6 +39,8 @@
                         News
                     </a>
                 </li>
+            </ul>
+            <ul class="navbar-nav my-2 my-lg-0">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="" id="navbardrop" data-toggle="dropdown">
                         Profil
@@ -73,7 +74,7 @@
                     <li class="nav-item">
                         <a class="nav-link text-light " href="#">
                             <img class="rounded-circle border align-middle" src="images/user.webp" alt="user pic" width="25" height="25">
-                            Contact n°1 
+                            Contact n°1
                             <span class="badge badge-danger">5</span>
                         </a>
                     </li>
@@ -118,5 +119,6 @@
     </div>
 </div>
 </body>
+
 
 </html>
