@@ -188,6 +188,11 @@ io.on('connection', (socket) => {
                             if (err) sqlError(err);
                             else{
                                 if(result.length===1){
+                                    con.query("CREATE TABLE friend_"+result[0].id+" (f_id INT, message TEXT, confirm BOOLEAN, FOREIGN KEY (f_id) REFERENCES utilisateur (id) ON DELETE CASCADE);",
+                                        function (err) {
+                                        if(err) sqlError(err);
+                                        else consoleInfo("Table friend_"+result[0].id+" created", "registerUser");
+                                    })
                                     con.query("INSERT INTO password (id, mdp) VALUES (" + result[0].id + ", \""+ mdp + "\")", function (err) {
                                         if(err) sqlError(err)
                                         else consoleInfo("New password stocked : "+mdp, "registerUser");
@@ -291,6 +296,52 @@ io.on('connection', (socket) => {
                 }else{
                     callback(false, "ERR_DATA_NOT_FOUND");
                     consoleInfo("ERR_DATA_NOT_FOUND", "userInfo");
+                }
+            }
+        });
+    });
+
+    socket.on('changeInfo', function (info, uuid, callback) {
+        if(callback===null) {
+            consoleInfo("ERR_NO_CALLBACK", "changeInfo");
+            return;
+        }
+        if(uuid===null) {
+            callback(false, "ERR_UUID_NULL");
+            consoleInfo("ERR_UUID_NULL", "changeInfo");
+            return;
+        }
+        if(info===null) {
+            callback(false, "ERR_MISSING_DATA");
+            consoleInfo("ERR_MISSING_DATA", "changeInfo");
+            return;
+        }
+        con.query("SELECT id FROM uuid WHERE uuid=\"" + uuid + "\"", function (err, result) {
+            if(err) sqlError(err);
+            else {
+                if(result.length===1){
+                    const nom = info.hasOwnProperty("nom") ? info.nom : null;
+                    const prenom = info.hasOwnProperty("prenom") ? info.prenom : null;
+                    const sexe = info.hasOwnProperty("sexe") ? info.sexe : null;
+                    const email = info.email;
+                    const sql = "UPDATE utilisateur SET email=\"" + email + "\"" +
+                        (nom===null ? "" : ", nom=\"" + nom + "\"") +
+                        (prenom===null ? "" : ", prenom=\"" + prenom + "\"") +
+                        (sexe===null ? "" : ", sexe=" + sexe) +
+                        " WHERE id=" + result[0].id;
+                    con.query(sql, function (err) {
+                        if(err) sqlError(err);
+                        else {
+                            consoleInfo("Mise a jour profil with id=" + result[0].id, "changeInfo");
+                            callback(true, null);
+                        }
+                    });
+                }else if(result.length>1){
+                    callback(false, "ERR_UUID_NOT_UNIQUE");
+                    consoleInfo("ERR_UUID_NOT_UNIQUE", "changeInfo");
+                }else{
+                    callback(false, "ERR_DATA_NOT_FOUND");
+                    consoleInfo("ERR_DATA_NOT_FOUND", "changeInfo");
                 }
             }
         });

@@ -4,25 +4,47 @@ isConnected(function (res) {
 getProfileElements();
 
 /*FUNCTIONS*/
+/*TODO
+*  - sécuriser les radios buttons
+* */
 
-function applyChangements() {
+function changeInfo() {
     const nom = document.getElementById("nom");
     const prenom = document.getElementById("prenom");
     const sexe = document.getElementsByName("sexe");
-    //const email = document.getElementById("email");
+    const email = document.getElementById("email");
+
+    let user = {}
+
+    if(nom.value !== nom.placeholder && nom.value!=="") user.nom = nom.value;
+    if(prenom.value !== nom.placeholder && prenom.value!=="") user.prenom = prenom.value;
+    for(let i=0; i<sexe.length; i++) {
+        if(sexe[i].checked) user.sexe = sexe[i].value;
+    }
+    if(Object.keys(user).length) {
+        user.email = email.placeholder;
+        socket.emit("changeInfo",user,getCookie("uuid"),function (res, err) {
+            if(err!==null) {
+                setAlert("infoAlert", err, "Erreur : ", "warning");
+            }
+            else {
+                setAlert("infoAlert", "les informations ont été mises a jour !" , "Succès : ", "success");
+                getProfileElements();
+            }
+        });
+    }
+    else {
+        setAlert("infoAlert", "Pas de changement");
+        console.log(user);
+    }
+    return false;
+}
+function changePassword() {
     const mdp = document.getElementById("mdp");
     const newmdp1 = document.getElementById("newmdp1");
     const newmdp2 = document.getElementById("newmdp2");
 
-    //let isMyObjectEmpty = !Object.keys(a).length;
 
-    let user = {}
-
-    if(nom.value !== nom.placeholder) user.nom = nom.value;
-    if(prenom.value !== nom.placeholder) user.prenom = prenom.value;
-    for(let i=0; i<sexe.length; i++) {
-        if(sexe[i].value.checked) user.sexe = sexe[i].value;
-    }
     if(mdp.length!==0 && newmdp1.length!==0 && newmdp2.length!==0) {
         const resMdp = testPassword(mdp.value);
         if(resMdp.res) {
@@ -47,17 +69,16 @@ function getProfileElements() {
         else console.log(err); //A MODIFIER
     });
 }
-
 function setProfileElements(user) {
     const nom = document.getElementById("nom");
     const prenom = document.getElementById("prenom");
     const sexe = document.getElementsByName("sexe");
     const email = document.getElementById("email");
 
-    nom.value = user.nom;
     nom.placeholder = user.nom;
-    prenom.value = user.prenom;
+    nom.value = "";
     prenom.placeholder = user.prenom;
-    email.value = user.email;
-    sexe[user.sexe-1].checked = true;
+    prenom.value = "";
+    email.placeholder = user.email;
+    if(user.sexe!==null) sexe[user.sexe-1].checked = true;
 }
