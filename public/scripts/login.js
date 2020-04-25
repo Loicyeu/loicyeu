@@ -7,14 +7,11 @@ function formLogin() {
 
     delAlert("alertAccountCreated");
 
-    if(pass!=="") {
-        if(email!==""){
-            if(regexEmail.test(email)) {
-                return loginUser(email, pass);
-            }
-        }
-    }
-    setAlert("alertLogin", "Les champs ne sont pas valides", "Erreur", "warning");
+    if(pass!=="" && email!=="") {
+        if(regexEmail.test(email)) {
+            return loginUser(email, pass);
+        }else setAlert("alertLogin", "l'adresse mail n'est pas valide", "Erreur", "warning");
+    }else setAlert("alertLogin", "l'un des champs est vide", "Erreur", "warning");
     return false;
 }
 
@@ -27,7 +24,10 @@ function loginUser(email, pass) {
             setCookie("uuid",res.uuid,res.expires);
             window.location.replace("./index.html");
         }
-        else setAlert("alertLogin", err, "", "warning");
+        else {
+            if(err==="ERR_DATA_NOT_FOUND") setAlert("alertLogin", "adresse email ou mot de passe invalide", "Erreur", "warning");
+            else setAlert("alertLogin", "erreur inattendue", "Alerte", "danger");
+        }
         loginButton.innerHTML = "Se connecter";
     });
     return false;

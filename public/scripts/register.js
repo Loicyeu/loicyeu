@@ -14,23 +14,26 @@ function formRegister() {
                     if(mdp1===mdp2) {
                         console.log("register User");
                         registerUser(nom, prenom, mdp1, email);
-                    }else setAlert("alertRegister", "les mots de passes ne sont pas identiques", "Erreur :", "warning");
-                }else setAlert("alertRegister", "le mot de passe n'est pas valide", "Erreur :", "warning");
-            }else setAlert("alertRegister", "le mot de passe n'est pas valide", "Erreur :", "warning");
-        }else setAlert("alertRegister", "l'adresse email est invalide", "Erreur :", "warning");
-    }else setAlert("alertRegister", "l'un des champs ne peut pas être vide", "Erreur :", "warning");
+                    }else setAlert("alertRegister", "les mots de passes ne sont pas identiques", "Erreur", "warning");
+                }else setAlert("alertRegister", "le mot de passe est invalide", "Erreur", "warning");
+            }else setAlert("alertRegister", "le mot de passe est invalide", "Erreur", "warning");
+        }else setAlert("alertRegister", "l'adresse email est invalide", "Erreur", "warning");
+    }else setAlert("alertRegister", "l'un des champs ne peut pas être vide", "Erreur", "warning");
     return false;
 }
 
 function registerUser(nom, prenom, mdp, email) {
-    console.log("create profile")
     delAlert("alertRegister");
     socket.emit("registerUser", nom, prenom, mdp, email, function (res, err) {
         if(res) {
-            setAlert("alertRegister", "Création du compte réussit !\nRedirection dans 5 secondes", "Félicitation : ", "success");
+            setAlert("alertRegister", "création du compte réussit !\nRedirection dans 5 secondes", "Félicitation", "success");
             setTimeout(()=>window.location.replace("login.html"),5000);
         }
-        else setAlert("alertRegister", err, "Erreur :", "warning");
+        else {
+            if(err==="ERR_EMAIL_INVALID") setAlert("alertRegister", "adresse email invalide", "Erreur", "warning");
+            else if(err==="ERR_EMAIL_NOT_UNIQUE") setAlert("alertRegister", "un autre compte utilise déjà cette adresse email", "Erreur", "warning");
+            else setAlert("alertRegister", "erreur inattendue", "Alerte", "danger");
+        }
     });
     return false;
 }

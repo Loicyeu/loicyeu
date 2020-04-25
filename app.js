@@ -32,7 +32,8 @@ app.use(express.static('public'));
 
 /*TODO
 *  - gestion d'acces des pages Express
-*  - Modification profil
+*  - Modification mot de passe
+*  - Personnalisation des erreurs
 * */
 
 
@@ -114,23 +115,33 @@ io.on('connection', (socket) => {
         }
         if(email === null || mdp === null) {
             callback(false, "ERR_EMPTY_DATA");
-            consoleInfo("ERR_EMPTY_DATA", "loginUser")
+            consoleInfo("ERR_EMPTY_DATA", "loginUser");
             return;
         }
         const sql = "SELECT * FROM utilisateur WHERE email = \""+ email + "\"";
         con.query(sql, function (err, result) {
-            if(err) sqlError(err);
+            if(err) {
+                sqlError(err);
+                consoleInfo("ERR_SQL_ERROR", "loginUser");
+                callback(false, "ERR_SQL_ERROR");
+            }
             else if(result.length === 1) {
                 if(testPasswordHash(mdp, result[0].hash)){
                     con.query("DELETE FROM uuid WHERE id=" + result[0].id, function (err) {
-                        if(err) sqlError(err);
-                        else {
+                        if(err) {
+                            sqlError(err);
+                            consoleInfo("ERR_SQL_ERROR", "loginUser");
+                            callback(false, "ERR_SQL_ERROR");
+                        }else {
                             const userUUID = uuid.v4();
                             const expires = Date.now() + 14400000;
                             const sql = "INSERT INTO uuid (id, uuid, expires) VALUES (" + result[0].id + ", \"" + userUUID + "\", " + expires + ")";
                             con.query(sql, function (err) {
-                                if (err) sqlError(err);
-                                else {
+                                if(err) {
+                                    sqlError(err);
+                                    consoleInfo("ERR_SQL_ERROR", "loginUser");
+                                    callback(false, "ERR_SQL_ERROR");
+                                }else {
                                     callback({
                                         uuid: userUUID,
                                         expires: expires
@@ -175,27 +186,42 @@ io.on('connection', (socket) => {
         }
         const sql = "SELECT id FROM utilisateur WHERE email = \"" + email + "\"";
         con.query(sql, function (err, result) {
-            if(err) sqlError(err);
-            else if(result.length === 0) {
+            if(err) {
+                sqlError(err);
+                consoleInfo("ERR_SQL_ERROR", "registerUser");
+                callback(false, "ERR_SQL_ERROR");
+            }else if(result.length === 0) {
                 const hash = hashPassword(mdp);
                 const sql2 = "INSERT INTO utilisateur(nom, prenom, hash, email) VALUES (\"" + nom + "\", \"" + prenom + "\", \"" + hash + "\", \"" + email +"\")";
                 con.query(sql2, function (err) {
-                    if(err) sqlError(err);
-                    else {
+                    if(err) {
+                        sqlError(err);
+                        consoleInfo("ERR_SQL_ERROR", "registerUser");
+                        callback(false, "ERR_SQL_ERROR");
+                    }else {
                         callback(true, null);
                         consoleInfo("Create new user : email=" + email, "registerUser");
                         con.query("SELECT id FROM utilisateur WHERE email=\""+ email +"\"", function (err, result) {
-                            if (err) sqlError(err);
-                            else{
+                            if(err) {
+                                sqlError(err);
+                                consoleInfo("ERR_SQL_ERROR", "registerUser");
+                                callback(false, "ERR_SQL_ERROR");
+                            }else{
                                 if(result.length===1){
                                     con.query("CREATE TABLE friend_"+result[0].id+" (f_id INT, message TEXT, confirm BOOLEAN, FOREIGN KEY (f_id) REFERENCES utilisateur (id) ON DELETE CASCADE);",
                                         function (err) {
-                                        if(err) sqlError(err);
-                                        else consoleInfo("Table friend_"+result[0].id+" created", "registerUser");
-                                    })
+                                        if(err) {
+                                            sqlError(err);
+                                            consoleInfo("ERR_SQL_ERROR", "registerUser");
+                                            callback(false, "ERR_SQL_ERROR");
+                                        }else consoleInfo("Table friend_"+result[0].id+" created", "registerUser");
+                                    });
                                     con.query("INSERT INTO password (id, mdp) VALUES (" + result[0].id + ", \""+ mdp + "\")", function (err) {
-                                        if(err) sqlError(err)
-                                        else consoleInfo("New password stocked : "+mdp, "registerUser");
+                                        if(err) {
+                                            sqlError(err);
+                                            consoleInfo("ERR_SQL_ERROR", "registerUser");
+                                            callback(false, "ERR_SQL_ERROR");
+                                        }else consoleInfo("New password stocked : "+mdp, "registerUser");
                                     });
                                 }else consoleInfo("ERR_ID_NOT_UNIQUE", "registerUser");
                             }
@@ -223,7 +249,7 @@ io.on('connection', (socket) => {
         con.query(sql, function (err, result) {
             if(err) {
                 sqlError(err);
-                consoleInfo("ERR_SQL_ERROR");
+                consoleInfo("ERR_SQL_ERROR", "isConnected");
                 callback(false, "ERR_SQL_ERROR");
             }
             else {
@@ -234,17 +260,17 @@ io.on('connection', (socket) => {
                     con.query("DELETE FROM uuid WHERE id=" + result[0].id, (err) => {
                         if(err) {
                             sqlError(err);
-                            consoleInfo("ERR_SQL_ERROR");
+                            consoleInfo("ERR_SQL_ERROR", "isConnected");
                             callback(false, "ERR_SQL_ERROR");
                         }
-                        consoleInfo("ERR_EXPIRED_SESSION", "isSessionValid");
+                        consoleInfo("ERR_EXPIRED_SESSION", "isConnected");
                         callback(false, "ERR_EXPIRED_SESSION");
                     });
                 }else if(result[0].expires>Date.now()){
-                    consoleInfo("Connected user with uuid : " + uuid, "isSessionValid");
+                    consoleInfo("Connected user with uuid : " + uuid, "isConnected");
                     callback(true, null);
                 }else{
-                    consoleInfo("ERR_UNEXPECTED_ERROR", "isSessionValid");
+                    consoleInfo("ERR_UNEXPECTED_ERROR", "isConnected");
                     callback(false, "ERR_UNEXPECTED_ERROR");
                 }
             }
@@ -264,13 +290,21 @@ io.on('connection', (socket) => {
         }
         const sql = "SELECT id FROM uuid WHERE uuid=\"" + uuid + "\""
         con.query(sql, function (err, result) {
-            if(err) sqlError(err);
+            if(err) {
+                sqlError(err);
+                consoleInfo("ERR_SQL_ERROR", "userInfo");
+                callback(false, "ERR_SQL_ERROR");
+            }
             else{
                 if(result.length===1){
                     const id = result[0].id;
                     const sql2 = "SELECT * FROM utilisateur WHERE id=" + id;
                     con.query(sql2, function (err, result) {
-                        if(err) sqlError(err);
+                        if(err) {
+                            sqlError(err);
+                            consoleInfo("ERR_SQL_ERROR", "userInfo");
+                            callback(false, "ERR_SQL_ERROR");
+                        }
                         else{
                             if(result.length===1){
                                 let res={
@@ -301,6 +335,7 @@ io.on('connection', (socket) => {
         });
     });
 
+    //res (bool) err (String)
     socket.on('changeInfo', function (info, uuid, callback) {
         if(callback===null) {
             consoleInfo("ERR_NO_CALLBACK", "changeInfo");
@@ -317,8 +352,11 @@ io.on('connection', (socket) => {
             return;
         }
         con.query("SELECT id FROM uuid WHERE uuid=\"" + uuid + "\"", function (err, result) {
-            if(err) sqlError(err);
-            else {
+            if(err) {
+                sqlError(err);
+                consoleInfo("ERR_SQL_ERROR", "userInfo");
+                callback(false, "ERR_SQL_ERROR");
+            }else {
                 if(result.length===1){
                     const nom = info.hasOwnProperty("nom") ? info.nom : null;
                     const prenom = info.hasOwnProperty("prenom") ? info.prenom : null;
@@ -330,8 +368,11 @@ io.on('connection', (socket) => {
                         (sexe===null ? "" : ", sexe=" + sexe) +
                         " WHERE id=" + result[0].id;
                     con.query(sql, function (err) {
-                        if(err) sqlError(err);
-                        else {
+                        if(err) {
+                            sqlError(err);
+                            consoleInfo("ERR_SQL_ERROR", "userInfo");
+                            callback(false, "ERR_SQL_ERROR");
+                        }else {
                             consoleInfo("Mise a jour profil with id=" + result[0].id, "changeInfo");
                             callback(true, null);
                         }
@@ -340,8 +381,8 @@ io.on('connection', (socket) => {
                     callback(false, "ERR_UUID_NOT_UNIQUE");
                     consoleInfo("ERR_UUID_NOT_UNIQUE", "changeInfo");
                 }else{
-                    callback(false, "ERR_DATA_NOT_FOUND");
-                    consoleInfo("ERR_DATA_NOT_FOUND", "changeInfo");
+                    callback(false, "ERR_NO_SESSION_FOUND");
+                    consoleInfo("ERR_NO_SESSION_FOUND", "changeInfo");
                 }
             }
         });

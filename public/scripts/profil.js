@@ -25,10 +25,11 @@ function changeInfo() {
         user.email = email.placeholder;
         socket.emit("changeInfo",user,getCookie("uuid"),function (res, err) {
             if(err!==null) {
-                setAlert("infoAlert", err, "Erreur : ", "warning");
+                if(err==="ERR_NO_SESSION_FOUND") disconnect();
+                else setAlert("infoAlert", "erreur inattendue", "Alerte", "danger");
             }
             else {
-                setAlert("infoAlert", "les informations ont été mises a jour !" , "Succès : ", "success");
+                setAlert("infoAlert", "les informations ont été mises a jour !" , "Succès", "success");
                 getProfileElements();
             }
         });
