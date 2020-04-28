@@ -25,7 +25,7 @@ function loginUser(email, pass) {
             window.location.replace("./index.html");
         }
         else {
-            if(err==="ERR_DATA_NOT_FOUND") setAlert("alertLogin", "adresse email ou mot de passe invalide", "Erreur", "warning");
+            if(err==="ERR_NOT_FOUND_DATA") setAlert("alertLogin", "adresse email ou mot de passe invalide", "Erreur", "warning");
             else setAlert("alertLogin", "erreur inattendue", "Alerte", "danger");
         }
         loginButton.innerHTML = "Se connecter";

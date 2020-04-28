@@ -19,8 +19,9 @@ function changeInfo() {
     if(nom.value !== nom.placeholder && nom.value!=="") user.nom = nom.value;
     if(prenom.value !== nom.placeholder && prenom.value!=="") user.prenom = prenom.value;
     for(let i=0; i<sexe.length; i++) {
-        if(sexe[i].checked) user.sexe = sexe[i].value;
+        if(sexe[i].checked && !sexe[i].defaultChecked) user.sexe = sexe[i].value;
     }
+    console.log(Object.keys(user))
     if(Object.keys(user).length) {
         user.email = email.placeholder;
         socket.emit("changeInfo",user,getCookie("uuid"),function (res, err) {
@@ -29,36 +30,43 @@ function changeInfo() {
                 else setAlert("infoAlert", "erreur inattendue", "Alerte", "danger");
             }
             else {
-                setAlert("infoAlert", "les informations ont été mises a jour !" , "Succès", "success");
+                setAlert("infoAlert", "les informations ont été mises à jour !" , "Succès", "success");
                 getProfileElements();
             }
         });
     }
     else {
-        setAlert("infoAlert", "Pas de changement");
+        setAlert("infoAlert", "Pas de changement apporté a vos informations");
         console.log(user);
     }
     return false;
 }
 function changePassword() {
-    const mdp = document.getElementById("mdp");
-    const newmdp1 = document.getElementById("newmdp1");
-    const newmdp2 = document.getElementById("newmdp2");
+    const mdp = document.getElementById("mdp").value;
+    const newmdp1 = document.getElementById("newmdp1").value;
+    const newmdp2 = document.getElementById("newmdp2").value;
 
-
-    if(mdp.length!==0 && newmdp1.length!==0 && newmdp2.length!==0) {
-        const resMdp = testPassword(mdp.value);
-        if(resMdp.res) {
-            const resNewMdp = testPassword(newmdp1.value);
-            if(newmdp1.value===newmdp2.value && resNewMdp.res) user.mdp = newmdp1.value;
-            else {
-                if(resNewMdp.res) setAlert("profilAlert", "ERR_PASSWORDS_DIFFERENT", "Nouveau mot de passe", "warning")
-                else setAlert("profilAlert", resNewMdp.err, "Nouveau mot de passe", "warning");
-            }
-        }else{
-            setAlert("profilAlert", resMdp.err, "Mot de passe actuel", "warning");
+    if(mdp!=="" && newmdp1!=="" && newmdp2!=="") {
+        const resNewMdp = testPassword(newmdp1);
+        if(resNewMdp.res){
+            if(newmdp1===newmdp2 && resNewMdp.res) {
+                socket.emit('changePass', newmdp1, mdp, getCookie("uuid"), function (res, err) {
+                    if(res) {
+                        setAlert("alertMdp", "le mot de passe a été mis à jour !" , "Succès", "success")
+                        getProfileElements();
+                    }else{
+                        if(err === "ERR_PASSWORD_NOT_MATCHING") setAlert("alertMdp", "votre mot de passe actuel n'est pas correct" , "Erreur", "warning");
+                        else if(err==="ERR_NO_SESSION_FOUND") disconnect();
+                        else setAlert("alertMdp", "erreur inattendue", "Alerte", "danger");
+                    }
+                });
+            }else setAlert("alertMdp", "les nouveaux mot de passes ne sont pas identiques", "Erreur", "warning");
+        }else {
+            if(resNewMdp.err === "ERR_PASSWORD_TOO_SHORT") setAlert("alertMdp", "le nouveau mot de passe est trop court", "Erreur", "warning");
+            else if(resNewMdp.err === "ERR_PASSWORD_INVALID") setAlert("alertMdp", "le nouveau mot de passe est invalide", "Erreur", "warning");
+            else setAlert("alertMdp", "l'un des champs est vide", "Erreur", "warning");
         }
-    }
+    }else setAlert("alertMdp", "l'un des champs est vide", "Erreur", "warning");
     return false;
 }
 
@@ -81,5 +89,7 @@ function setProfileElements(user) {
     prenom.placeholder = user.prenom;
     prenom.value = "";
     email.placeholder = user.email;
-    if(user.sexe!==null) sexe[user.sexe-1].checked = true;
+    if(user.sexe!==null) {
+        sexe[user.sexe-1].defaultChecked = true;
+    }
 }

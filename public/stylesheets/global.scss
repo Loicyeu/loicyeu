@@ -1,0 +1,75 @@
+$colors:
+    "darkgrey1" #3A3F46,
+    "darkgrey2" #33373E;
+
+/*****************************
+*      BACKGROUND-COLOR      *
+*****************************/
+@each $name, $hex in $colors {
+    .bg-#{$name}{
+        background-color: $hex;
+    }
+}
+
+/***********************
+*      TEXT-COLOR      *
+***********************/
+@each $name, $hex in $colors {
+    .text-#{$name}{
+        color: $hex;
+    }
+}
+
+
+/*******************
+*      HEADER      *
+*******************/
+
+nav{
+    .dropdown{
+        .dropdown-item:hover{
+            background-color: #33373E;
+        }
+    }
+}
+
+
+/*******************
+*      FOOTER      *
+*******************/
+
+footer{
+
+    a{
+        color: #d2d1d1;
+    }
+    a.logo{
+        float: left;
+        font-weight: bold;
+    }
+
+    h2{
+        margin: 0;
+    }
+
+    div.second-bar{
+
+        div.social-icons{
+            float: right;
+
+            a{
+                padding-left: 1em;
+                padding-right: 1em;
+            }
+            a.twitter:hover{
+                color: #00aced;
+            }
+            a.facebook:hover{
+                color: #0077e2;
+            }
+            a.google:hover{
+                color: #ef1a1a;
+            }
+        }
+    }
+}
