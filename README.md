@@ -12,16 +12,16 @@
 ####Fonction loginUser :
 - ERR_NO_CALLBACK : *Pas de callback*
 - ERR_EMPTY_DATA : *Les variables sont oubliés*
-- **ERR_DATA_NOT_FOUND** : *SQl n'a pas retourné de tuple*
+- **ERR_NOT_FOUND_DATA** : *SQl n'a pas retourné de tuple*
 - ERR_EMAIL_NOT_UNIQUE : *Plusieurs email identiques dans la BDD*
 - ERR_SQL_ERROR
 
 ####Fonction registerUser :
 - ERR_NO_CALLBACK : *Pas de callback*
 - ERR_EMPTY_DATA : *Les variables sont oubliés*
-- **ERR_EMAIL_INVALID** : *L'email n'est pas valide*
+- **ERR_INVALID_EMAIL** : *L'email n'est pas valide*
 - ERR_ID_NOT_UNIQUE : 
-- **ERR_EMAIL_NOT_UNIQUE** : 
+- **ERR_NOT_UNIQUE_EMAIL** : 
 - ERR_SQL_ERROR
 
 ####Fonction isConnected
@@ -34,17 +34,38 @@
 
 ####Fonction userInfo :
 - ERR_NO_CALLBACK : *Pas de callback*
-- ERR_UUID_NULL : *L'uuid est nul*
+- ERR_NULL_UUID : *L'uuid est nul*
 - ERR_ID_NOT_UNIQUE
 - ERR_UNEXPECTED_ERROR
-- ERR_UUID_NOT_UNIQUE
-- ERR_DATA_NOT_FOUND
+- ERR_NOT_UNIQUE_UUID
+- ERR_NOT_FOUND_DATA
 - ERR_SQL_ERROR
 
 ####Fonction changeInfo :
 - ERR_NO_CALLBACK : 
-- ERR_UUID_NULL : 
+- ERR_NULL_UUID : 
 - ERR_MISSING_DATA : 
 - ERR_SQL_ERROR : 
-- ERR_UUID_NOT_UNIQUE : 
-- **ERR_NO_SESSION_FOUND** : 
+- ERR_NOT_UNIQUE_UUID : 
+- **ERR_NO_SESSION_FOUND**
+
+
+####Fonction addFriend :
+- ERR_NO_CALLBACK
+- ERR_NULL_UUID
+- ERR_MISSING_DATA
+- ERR_INVALID_ID
+- ERR_SQL_ERROR
+- ERR_NOT_UNIQUE_UUID
+- **ERR_NO_SESSION_FOUND**
+
+####Fonction changePass :
+- ERR_NO_CALLBACK
+- ERR_NULL_UUID
+- ERR_MISSING_DATA
+- ERR_SQL_ERROR
+- ERR_NOT_UNIQUE_UUID
+- **ERR_NO_SESSION_FOUND**
+- ERR_NOT_UNIQUE_ID
+- ERR_UNEXPECTED_ERROR
+- **ERR_PASSWORD_NOT_MATCHING**

@@ -1,348 +1,60 @@
-/*
-https://coolors.co/1e3888-4764bc-6186f4-688eff-37509b
-https://coolors.co/0b3954-c0dbea-63c5ff-4fbeff-ffffff
-https://coolors.co/23c9ff-7cdeff-ccf2ff-bbdde8-83b5c6
-https://coolors.co/4392f1-e8ebef-e2efff-e8f2ff-3982db
-https://coolors.co/c6d4ff-7985aa-2f3f72-122766-2c51c1
-*/
-
-:root{
-    --flatFlesh: #fad390;
-    --squashBlossom: #f6b93b;
-    --icelandPoppy: #fa983a;
-    --carrotOrange: #e58e26;
-    --melonMelody: #f8c291;
-    --mandarinRed: #e55039;
-    --tomatoRed: #eb2f06;
-    --jalapenoRed: #b71540;
-    --livid: #6a89cc;
-    --azraqBlue: #4a69bd;
-    --yueGuangLanBlue: #1e3799;
-    --darkSapphire: #0c2461;
-    --spray: #82ccdd;
-    --duplain: #60a3bc;
-    --goodSamaritan: #3c6382;
-    --forestBlue: #0a3d62;
-    --paradiseGreen: #b8e994;
-    --auroraGreen: #78e08f;
-    --waterfall: #38ada9;
-    --reefEncouter: #079992;
-    --tealBlue: #38618c;
-    --brilliantAzure: #35a7ff;
-
-    --cosmicCobalt: #1E3888;
-    --hanBlue: #4764BC;
-    --blueBerry1: #6186F4;
-    --cornflowerBlue: #688EFF;
-    --cyanCobaltBlue: #37509B;
-    --prussianBlue: #0B3954
-    ;--columbiaBlue: #C0DBEA;
-    --mayaBlue1: #63C5FF;
-    --mayaBlue2: #4FBEFF;
-    --spiroDiscoBall: #23C9FF;
-    --electricBlue: #7CDEFF;
-    --diamond: #CCF2FF;
-    --paleAqua: #BBDDE8;
-    --moonstoneBlue: #83B5C6;
-    --blueBerry2: #4392F1;
-    --bleuDeFrance: #3982DB;
-    --deepKoamaru: #2F3F72;
-    --royalBlue: #122766;
-    --ceruleanBlue: #2C51C1;
-}
-/*
-   ____          _____ _  _______ _____   ____  _    _ _   _ _____     _____ ____  _      ____  _____  
-  |  _ \   /\   / ____| |/ / ____|  __ \ / __ \| |  | | \ | |  __ \   / ____/ __ \| |    / __ \|  __ \ 
-  | |_) | /  \ | |    | ' / |  __| |__) | |  | | |  | |  \| | |  | | | |   | |  | | |   | |  | | |__) |
-  |  _ < / /\ \| |    |  <| | |_ |  _  /| |  | | |  | | . ` | |  | | | |   | |  | | |   | |  | |  _  / 
-  | |_) / ____ \ |____| . \ |__| | | \ \| |__| | |__| | |\  | |__| | | |___| |__| | |___| |__| | | \ \ 
-  |____/_/    \_\_____|_|\_\_____|_|  \_\\____/ \____/|_| \_|_____/   \_____\____/|______\____/|_|  \_\
-*/ 
-
-.bg-1c1c1c{
-    background-color: #1C1C1C;
-}
-.bg-7a7d7d{
-    background-color: #7A7D7D;
-}
-.bg-d0cfcf{
-    background-color: #D0CFCF;
-}
-.bg-eef0f2{
-    background-color: #EEF0F2;
-}
-.bg-fafaff{
-    background-color: #FAFAFF;
+/*****************************
+*      BACKGROUND-COLOR      *
+*****************************/
+.bg-darkgrey1 {
+  background-color: #3A3F46;
 }
 
-.bg-flatFlesh{
-    background-color: #fad390;
-}
-.bg-squashBlossom{
-    background-color: #f6b93b;
-}
-.bg-icelandPoppy{
-    background-color: #fa983a;
-}
-.bg-carrotOrange{
-    background-color: #e58e26;
-}
-.bg-melonMelody{
-    background-color: #f8c291;
-}
-.bg-mandarinRed{
-    background-color: #e55039;
-}
-.bg-tomatoRed{
-    background-color: #eb2f06;
-}
-.bg-jalapenoRed{
-    background-color: #b71540;
-}
-.bg-livid{
-    background-color: #6a89cc;
-}
-.bg-azraqBlue{
-    background-color: #4a69bd;
-}
-.bg-yueGuangLanBlue{
-    background-color: #1e3799;
-}
-.bg-darkSapphire{
-    background-color: #0c2461;
-}
-.bg-spray{
-    background-color: #82ccdd;
-}
-.bg-duplain{
-    background-color: #60a3bc;
-}
-.bg-goodSamaritan{
-    background-color: #3c6382;
-}
-.bg-forestBlue{
-    background-color: #0a3d62;
-}
-.bg-paradiseGreen{
-    background-color: #b8e994;
-}
-.bg-auroraGreen{
-    background-color: #78e08f;
-}
-.bg-waterfall{
-    background-color: #38ada9;
-}
-.bg-reefEncouter{
-    background-color: #079992;
-}
-.bg-tealBlue{
-    background-color: var(--tealBlue);
-}
-.bg-brilliantAzure{
-    background-color: var(--brilliantAzure);
+.bg-darkgrey2 {
+  background-color: #33373E;
 }
 
-.bg-cosmicCobalt{
-	background-color : var(cosmicCobalt);
-}
-.bg-hanBlue{
-	background-color : var(hanBlue);
-}
-.bg-blueBerry1{
-	background-color : var(blueBerry1);
-}
-.bg-cornflowerBlue{
-	background-color : var(cornflowerBlue);
-}
-.bg-cyanCobaltBlue{
-	background-color : var(cyanCobaltBlue);
-}
-.bg-prussianBlue{
-	background-color : var(prussianBlue);
-}
-.bg-columbiaBlue{
-	background-color : var(columbiaBlue);
-}
-.bg-mayaBlue1{
-	background-color : var(mayaBlue1);
-}
-.bg-mayaBlue2{
-	background-color : var(mayaBlue2);
-}
-.bg-spiroDiscoBall{
-	background-color : var(spiroDiscoBall);
-}
-.bg-electricBlue{
-	background-color : var(electricBlue);
-}
-.bg-diamond{
-	background-color : var(diamond);
-}
-.bg-paleAqua{
-	background-color : var(paleAqua);
-}
-.bg-moonstoneBlue{
-	background-color : var(moonstoneBlue);
-}
-.bg-blueBerry2{
-	background-color : var(blueBerry2);
-}
-.bg-bleuDeFrance{
-	background-color : var(bleuDeFrance);
-}
-.bg-deepKoamaru{
-	background-color : var(deepKoamaru);
-}
-.bg-royalBlue{
-	background-color : var(royalBlue);
-}
-.bg-ceruleanBlue{
-	background-color : var(ceruleanBlue);
-}
-/*
-  _______ ________   _________    _____ ____  _      ____  _____  
- |__   __|  ____\ \ / /__   __|  / ____/ __ \| |    / __ \|  __ \ 
-    | |  | |__   \ V /   | |    | |   | |  | | |   | |  | | |__) |
-    | |  |  __|   > <    | |    | |   | |  | | |   | |  | |  _  / 
-    | |  | |____ / . \   | |    | |___| |__| | |___| |__| | | \ \ 
-    |_|  |______/_/ \_\  |_|     \_____\____/|______\____/|_|  \_\
-*/
-.text-1c1c1c{
-    color: #1C1C1C;
-}
-.text-7a7d7d{
-    color: #7A7D7D;
-}
-.text-d0cfcf{
-    color: #D0CFCF;
-}
-.text-eef0f2{
-    color: #EEF0F2;
-}
-.text-fafaff{
-    color: #FAFAFF;
+/***********************
+*      TEXT-COLOR      *
+***********************/
+.text-darkgrey1 {
+  color: #3A3F46;
 }
 
-.text-flatFlesh{
-    color: #fad390;
+.text-darkgrey2 {
+  color: #33373E;
 }
-.text-squashBlossom{
-    color: #f6b93b;
+
+/*******************
+*      HEADER      *
+*******************/
+nav .dropdown .dropdown-item:hover {
+  background-color: #33373E;
 }
-.text-icelandPoppy{
-    color: #fa983a;
+
+/*******************
+*      FOOTER      *
+*******************/
+footer a {
+  color: #d2d1d1;
 }
-.text-carrotOrange{
-    color: #e58e26;
+footer a.logo {
+  float: left;
+  font-weight: bold;
 }
-.text-melonMelody{
-    color: #f8c291;
+footer h2 {
+  margin: 0;
 }
-.text-mandarinRed{
-    color: #e55039;
+footer div.second-bar div.social-icons {
+  float: right;
 }
-.text-tomatoRed{
-    color: #eb2f06;
+footer div.second-bar div.social-icons a {
+  padding-left: 1em;
+  padding-right: 1em;
 }
-.text-jalapenoRed{
-    color: #b71540;
+footer div.second-bar div.social-icons a.twitter:hover {
+  color: #00aced;
 }
-.text-livid{
-    color: #6a89cc;
+footer div.second-bar div.social-icons a.facebook:hover {
+  color: #0077e2;
 }
-.text-azraqBlue{
-    color: #4a69bd;
+footer div.second-bar div.social-icons a.google:hover {
+  color: #ef1a1a;
 }
-.text-yueGuangLanBlue{
-    color: #1e3799;
-}
-.text-darkSapphire{
-    color: #0c2461;
-}
-.text-spray{
-    color: #82ccdd;
-}
-.text-duplain{
-    color: #60a3bc;
-}
-.text-goodSamaritan{
-    color: #3c6382;
-}
-.text-forestBlue{
-    color: #0a3d62;
-}
-.text-paradiseGreen{
-    color: #b8e994;
-}
-.text-auroraGreen{
-    color: #78e08f;
-}
-.text-waterfall{
-    color: #38ada9;
-}
-.text-reefEncouter{
-    color: #079992;
-}
-.text-tealBlue{
-    color: var(--tealBlue);
-}
-.text-brilliantAzure{
-    color: var(--brilliantAzure);
-}
-.text-cosmicCobalt{
-	color : var(cosmicCobalt);
-}
-.text-hanBlue{
-	color : var(hanBlue);
-}
-.text-blueBerry1{
-	color : var(blueBerry1);
-}
-.text-cornflowerBlue{
-	color : var(cornflowerBlue);
-}
-.text-cyanCobaltBlue{
-	color : var(cyanCobaltBlue);
-}
-.text-prussianBlue{
-	color : var(prussianBlue);
-}
-.text-columbiaBlue{
-	color : var(columbiaBlue);
-}
-.text-mayaBlue1{
-	color : var(mayaBlue1);
-}
-.text-mayaBlue2{
-	color : var(mayaBlue2);
-}
-.text-spiroDiscoBall{
-	color : var(spiroDiscoBall);
-}
-.text-electricBlue{
-	color : var(electricBlue);
-}
-.text-diamond{
-	color : var(diamond);
-}
-.text-paleAqua{
-	color : var(paleAqua);
-}
-.text-moonstoneBlue{
-	color : var(moonstoneBlue);
-}
-.text-blueBerry2{
-	color : var(blueBerry2);
-}
-.text-bleuDeFrance{
-	color : var(bleuDeFrance);
-}
-.text-deepKoamaru{
-	color : var(deepKoamaru);
-}
-.text-royalBlue{
-	color : var(royalBlue);
-}
-.text-ceruleanBlue{
-	color : var(ceruleanBlue);
-}
+
+/*# sourceMappingURL=global.css.map */

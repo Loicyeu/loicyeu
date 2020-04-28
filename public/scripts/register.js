@@ -30,8 +30,8 @@ function registerUser(nom, prenom, mdp, email) {
             setTimeout(()=>window.location.replace("login.html"),5000);
         }
         else {
-            if(err==="ERR_EMAIL_INVALID") setAlert("alertRegister", "adresse email invalide", "Erreur", "warning");
-            else if(err==="ERR_EMAIL_NOT_UNIQUE") setAlert("alertRegister", "un autre compte utilise déjà cette adresse email", "Erreur", "warning");
+            if(err==="ERR_INVALID_EMAIL") setAlert("alertRegister", "adresse email invalide", "Erreur", "warning");
+            else if(err==="ERR_NOT_UNIQUE_EMAIL") setAlert("alertRegister", "un autre compte utilise déjà cette adresse email", "Erreur", "warning");
             else setAlert("alertRegister", "erreur inattendue", "Alerte", "danger");
         }
     });

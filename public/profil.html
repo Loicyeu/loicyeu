@@ -6,6 +6,7 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="stylesheets/globalColor.css">
     <link rel="stylesheet" href="stylesheets/global.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -22,7 +23,7 @@
 <body class="bg-brilliantAzure">
 <div>
     <!--NAVBAR-->
-    <nav class="navbar navbar-expand-sm bg-darkSapphire navbar-dark sticky-top">
+    <nav class="navbar navbar-expand-sm bg-darkgrey2 navbar-dark sticky-top">
         <a class="navbar-brand font-weight-bold" href="https://loicyeu.fr">loicyeu.fr</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
             <span class="navbar-toggler-icon"></span>
@@ -36,7 +37,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="https://news.loicyeu.fr">
                         News
                     </a>
                 </li>
@@ -44,18 +45,18 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                         Profil
                     </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">
+                    <div class="dropdown-menu bg-darkgrey1">
+                        <a class="dropdown-item text-white font-weight-light" href="#">
                             <i class="far fa-user-circle"></i>
                             Mes informations
                         </a>
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item text-white font-weight-light" href="#">
                             <i class="fas fa-cog"></i>
                             Préférences
                             </i>
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#" onclick="disconnect()">
+                        <a class="dropdown-item text-white font-weight-light" href="#" onclick="disconnect()">
                             <i class="fas fa-sign-out-alt"></i>
                             Déconnexion
                         </a>
@@ -79,9 +80,9 @@
             <div class="col-10">
                 <div class="tab-content" id="v-pills-tabContent">
                     <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
-                        <div id="infoAlert"></div>
                         <h3>Modifier ses informations personnelles</h3>
                         <p class="text-muted">Veuillez remplir uniquement les champs que vous souhaitez changer</p>
+                        <div id="infoAlert"></div>
                         <form class="mb-5" onsubmit="return changeInfo()">
                             <div class="form-group row">
                                 <label for="nom" class="col-sm-2 col-form-label">Nom</label>
@@ -129,6 +130,7 @@
                         <hr>
                         <div id="mdpAlert"></div>
                         <h3>Changer de mot de passe</h3>
+                        <div id="alertMdp"></div>
                         <form class="mb-5" onsubmit="return changePassword()">
                             <div class="form-group row">
                                 <label for="mdp" class="col-sm-3 col-form-label">Mot de passe actuel</label>
@@ -153,8 +155,7 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-12">
-                                    <button type="submit" class="btn btn-primary" disabled> Changer le mot de passe </button>
-                                    <small class="text-muted">Fonctionalité a venir...</small>
+                                    <button type="submit" class="btn btn-primary"> Changer le mot de passe </button>
                                 </div>
                             </div>
                         </form>
@@ -166,6 +167,53 @@
             </div>
         </div>
     </div>
+
+    <!--FOOTER-->
+    <footer class="pt-4 text-white bg-darkgrey1">
+        <div class="container first-bar">
+            <div class="row">
+                <div class="col-sm-3">
+                    <h5>Get started</h5>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Sign up</a></li>
+                        <li><a href="#">Downloads</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3">
+                    <h5>About us</h5>
+                    <ul>
+                        <li><a href="#">Company Information</a></li>
+                        <li><a href="#">Contact us</a></li>
+                        <li><a href="#">Reviews</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3">
+                    <h5>Support</h5>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Help desk</a></li>
+                        <li><a href="#">Forums</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3 info">
+                    <h5>Information</h5>
+                    <p> Lorem ipsum dolor amet, consectetur adipiscing elit. Etiam consectetur aliquet aliquet. Interdum et malesuada fames ac ante ipsum primis in faucibus. </p>
+                </div>
+            </div>
+        </div>
+        <div class="second-bar bg-darkgrey2">
+            <div class="container">
+                <h2 class="logo py-4"><a href="#"> Loicyeu.fr </a>
+                    <div class="social-icons">
+                        <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="google"><i class="fab fa-google-plus-g"></i></a>
+                    </div>
+                </h2>
+            </div>
+        </div>
+    </footer>
 </div>
 </body>
 

@@ -5,7 +5,8 @@ function setAlert(id, msg, title="", color="secondary") {
 
     delAlert(id)
     document.getElementById(id).className += "alert alert-" + color;
-    document.getElementById(id).innerHTML += "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button><strong>"+ title +" : </strong>" + msg;
+    document.getElementById(id).innerHTML += "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>"+
+        (title!==""? "<strong>"+ title +" : </strong>"+msg : msg);
 
 }
 function delAlert(id) {
