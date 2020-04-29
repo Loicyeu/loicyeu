@@ -1,5 +1,5 @@
 isConnected(function (res) {
-    if(!res) window.location.replace("./login.html");
+    if(!res) disconnect();
 });
 getProfileElements();
 
@@ -21,7 +21,6 @@ function changeInfo() {
     for(let i=0; i<sexe.length; i++) {
         if(sexe[i].checked && !sexe[i].defaultChecked) user.sexe = sexe[i].value;
     }
-    console.log(Object.keys(user))
     if(Object.keys(user).length) {
         user.email = email.placeholder;
         socket.emit("changeInfo",user,getCookie("uuid"),function (res, err) {
@@ -37,7 +36,6 @@ function changeInfo() {
     }
     else {
         setAlert("infoAlert", "Pas de changement apporté a vos informations");
-        console.log(user);
     }
     return false;
 }
@@ -92,4 +90,47 @@ function setProfileElements(user) {
     if(user.sexe!==null) {
         sexe[user.sexe-1].defaultChecked = true;
     }
+}
+
+function testPP() {
+    let file = document.getElementById("profilePicture").files;
+    const text = document.getElementById("labelPP");
+    const submit = document.getElementById("submitPP");
+    const maxSize = 1024*1024*5; //5Mo
+
+    if(file.length===0) {
+        text.innerHTML = "";
+        submit.disabled = true;
+    }else{
+        file = file.item(0);
+        if(file.size > maxSize){
+            text.innerHTML = "Taille max: 5Mo, votre fichier: "+sizeToString(file.size);
+            text.className = "text-danger";
+            submit.disabled = true;
+        }else{
+            if(file.type!=="image/png" && file.type!=="image/jpeg") {
+                text.innerHTML = "Extension interdite, fichier autorisé : .png .jpg .jpeg";
+                text.className = "text-danger";
+                submit.disabled = true;
+            }else{
+                let str;
+                if(file.name.length>25) str = file.name.slice(0,15)+"..."+file.name.slice(file.name.length-7);
+                else str=file.name;
+                text.innerHTML = "Sélectionné: "+str;
+                text.className = "text-success";
+                submit.disabled = false;
+            }
+        }
+    }
+}
+function changePP() {
+    let file = document.getElementById("profilePicture").files;
+    console.log(file);
+    if(file.length===0) alert("y'a r");
+    else {
+        file = file.item(0);
+        console.log(file.name);
+    }
+
+    return false;
 }

@@ -62,3 +62,11 @@ function testPassword(password) {
     else if(password.length<8) return {res: false, err: "ERR_PASSWORD_TOO_SHORT"}
     else return {res: true, err: null}
 }
+function sizeToString(size) {
+    if(size>1024) {
+        if(size>(1024*1024)){
+            if(size>(1024*1024*1024)) return Math.round(size/(1024*1024*1024))+"Go";
+            else return Math.round(size/(1024*1024))+"Mo";
+        }else return Math.round(size/1024)+"ko";
+    }else return size+"o";
+}
