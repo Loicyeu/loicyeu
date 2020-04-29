@@ -1,14 +1,15 @@
 const express = require('express');
+const app = express();
 const fileUpload = require('express-fileupload');
 const path = require('path');
-const app = express();
-const fs = require('fs');
+//const fs = require('fs');
 const http = require('http').createServer(app);
 /*const https = require('https').createServer({
     key: fs.readFileSync("private_key.key"),
     cert: fs.readFileSync("cer.cer")
 },app);*/
 const io = require('socket.io')(http); //(https)
+const nodemailer = require('nodemailer');
 const mysql = require('mysql');
 const uuid = require('uuid');
 const bcrypt = require('bcrypt');
@@ -30,21 +31,57 @@ con.connect(function(err) {
 http.listen(3000, () => {
     console.log('listening on port : 3000');
 });
+
 app.use(express.static('public'));
+app.use(fileUpload());
+app.post('/profil.html', function (req, res) {
+    console.log(Object.keys(res));
+    if(!req.files || Object.keys(req.files).length===0) {
+        return res.status(400).sendFile(path.join(__dirname,'public/profil.html'));
+    }
+
+    let file = req.files.profilePicture;
+    file.mv('uploads/file.png', function (err) {
+        if(err) return res.status(500).send(err);
+        else res.send('File uploaded !');
+    });
+});
+//<input class="form-control-file mt-4 rounded" type="file" name="profilePicture">
 
 /*
-app.use(fileUpload({
-    limits: { fileSize: 50*1024*1024}
-}));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname,'public/login.html')));
 */
 
 /*TODO
 *  - gestion d'acces des pages Express
-*  - Modification mot de passe
-*  - Faille changeInfo peut changer l'email
+*  - Nodemailer
+*  - Color scheme
 * */
 
+/*
+* NODE MAILER
+* *//*
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: "loicyeu@gmail.com",
+        pass: "5!x8Df{4vD"
+    }
+}, function (error, info) {
+    if (error) {
+        console.log(error);
+    } else {
+        console.log('Email sent: ' + info.response);
+    }
+});
+
+let info = transporter.sendMail({
+    from: "Loicyeu.fr",
+    to: "loic.henry2001@gmail.com",
+    subject: "Hello ✔",
+    text: "Hello world?",
+    html: "<h1>Hello world?</h1>"
+})*/
 
 /*
 * FONCTIONS

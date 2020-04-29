@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
     <link rel="stylesheet" href="stylesheets/globalColor.css">
     <link rel="stylesheet" href="stylesheets/global.css">
+    <link rel="stylesheet" href="stylesheets/profil.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -83,50 +84,67 @@
                         <h3>Modifier ses informations personnelles</h3>
                         <p class="text-muted">Veuillez remplir uniquement les champs que vous souhaitez changer</p>
                         <div id="infoAlert"></div>
-                        <form class="mb-5" onsubmit="return changeInfo()">
-                            <div class="form-group row">
-                                <label for="nom" class="col-sm-2 col-form-label">Nom</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="nom">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="prenom" class="col-sm-2 col-form-label">Prénom</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="prenom">
-                                </div>
-                            </div>
-                            <fieldset class="form-group">
-                                <div class="row">
-                                    <legend class="col-form-label col-sm-2 pt-0">Sexe</legend>
-                                    <div class="col-sm-10">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="sexe" id="sexe1" value="1">
-                                            <label class="form-check-label" for="sexe1"> Homme </label>
+                        <div class="mb-5 row">
+                            <form class="col-8 border-right" method="post" onsubmit="return changeInfo()" >
+                                <div class="form-group row">
+                                            <label for="nom" class="col-sm-2 col-form-label">Nom</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="nom">
+                                            </div>
                                         </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="sexe" id="sexe2" value="2">
-                                            <label class="form-check-label" for="sexe2"> Femme </label>
+                                <div class="form-group row">
+                                            <label for="prenom" class="col-sm-2 col-form-label">Prénom</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="prenom">
+                                            </div>
                                         </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="sexe" id="sexe3" value="3">
-                                            <label class="form-check-label" for="sexe3"> Autre </label>
+                                <fieldset class="form-group">
+                                            <div class="row">
+                                                <legend class="col-form-label col-sm-2 pt-0">Sexe</legend>
+                                                <div class="col-sm-10">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="sexe" id="sexe1" value="1">
+                                                        <label class="form-check-label" for="sexe1"> Homme </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="sexe" id="sexe2" value="2">
+                                                        <label class="form-check-label" for="sexe2"> Femme </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="sexe" id="sexe3" value="3">
+                                                        <label class="form-check-label" for="sexe3"> Autre </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                <div class="form-group row">
+                                            <label for="email" class="col-sm-2 col-form-label">Email</label>
+                                            <div class="col-sm-10">
+                                                <input type="email" class="form-control" id="email" value="" readonly>
+                                            </div>
                                         </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-12">
+                                        <button type="submit" class="btn btn-primary"> Appliquer les modifications</button>
                                     </div>
                                 </div>
-                            </fieldset>
-                            <div class="form-group row">
-                                <label for="email" class="col-sm-2 col-form-label">Email</label>
-                                <div class="col-sm-10">
-                                    <input type="email" class="form-control" id="email" value="" readonly>
+                            </form>
+                            <form class="col-4" method="post" onsubmit="return false" enctype="multipart/form-data">
+                                <div class="text-center">
+                                    <img src="images/user.webp" class="border rounded-circle mt-2" width="150" height="150"/>
+                                    <div class="form-group">
+                                        <label for="profilePicture" class="profilePicture btn btn-light mt-3 mb-0 d-block">
+                                            <i class="fas fa-file-upload mr-1"></i>&nbsp;Choisir une photo...
+                                        </label>
+                                        <small class="" id="labelPP"></small>
+                                        <input class="form-control-file mt-4" type="file" name="profilePicture" id="profilePicture" onchange="testPP()" accept="image/png, image/jpeg">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="submit" id="submitPP" class="btn btn-primary" value="Appliquer la modification" onclick="changePP()" disabled>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-sm-12">
-                                    <button type="submit" class="btn btn-primary"> Appliquer les modifications</button>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                         <hr>
                         <div id="mdpAlert"></div>
                         <h3>Changer de mot de passe</h3>
