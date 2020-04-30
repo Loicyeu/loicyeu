@@ -6,8 +6,10 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900">
-    <link rel="stylesheet" href="stylesheets/index.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="stylesheets/index.css">
+    <link rel="stylesheet" href="stylesheets/global.css">
+    <link rel="stylesheet" href="stylesheets/globalColor.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -18,38 +20,40 @@
     <script src="scripts/global.js"></script>
     <title>News | loicyeu.fr</title>
 </head>
-<body>
-
-    <div class="container">
-        <header class="blog-header py-3">
-            <div class="row flex-nowrap justify-content-between align-items-center">
-                <div class="col-4 pt-1">
-                    <a class="text-muted" href="#">S'inscrire</a>
-                </div>
-                <div class="col-4 text-center">
-                    <a class="blog-header-logo text-dark" href="#">Loicyeu's News</a>
-                </div>
-                <div class="col-4 d-flex justify-content-end align-items-center">
-                    <a class="btn btn-sm btn-outline-secondary" href="#">Se connecter</a>
-                </div>
+<body class="bg-lightgrey1">
+    <!--HEADER-->
+    <header class="blog-header py-3 sticky-top bg-darkgrey2">
+        <div class="row flex-nowrap justify-content-between align-items-center mx-3">
+            <div class="col-4 pt-1">
+                <a class="text-white" href="#">S'inscrire</a>
             </div>
-        </header>
-
-        <div class="nav-scroller py-1 mb-2">
-            <nav class="nav d-flex justify-content-between">
-                <a class="p-2 text-muted" href="#">Monde</a>
-                <a class="p-2 text-muted" href="#">France</a>
-                <a class="p-2 text-muted" href="#">Technologie</a>
-                <a class="p-2 text-muted" href="#">Design</a>
-                <a class="p-2 text-muted" href="#">Culture</a>
-                <a class="p-2 text-muted" href="#">Business</a>
-                <a class="p-2 text-muted" href="#">Politique</a>
-                <a class="p-2 text-muted" href="#">Science</a>
-                <a class="p-2 text-muted" href="#">Santé</a>
-                <a class="p-2 text-muted" href="#">Voyages</a>
-            </nav>
+            <div class="col-4 text-center">
+                <a class="blog-header-logo text-white" href="#">Loicyeu's News</a>
+            </div>
+            <div class="col-4 d-flex justify-content-end align-items-center">
+                <a class="btn btn-sm btn-outline-secondary" href="#">Se connecter</a>
+            </div>
         </div>
+    </header>
 
+    <!--SUB HEADER-->
+    <div class="nav-scroller py-1 mb-2 bg-darkgrey1">
+        <nav class="nav d-flex justify-content-around">
+            <a class="p-2 text-white" href="#">Monde</a>
+            <a class="p-2 text-white" href="#">France</a>
+            <a class="p-2 text-white" href="#">Technologie</a>
+            <a class="p-2 text-white" href="#">Design</a>
+            <a class="p-2 text-white" href="#">Culture</a>
+            <a class="p-2 text-white" href="#">Business</a>
+            <a class="p-2 text-white" href="#">Politique</a>
+            <a class="p-2 text-white" href="#">Science</a>
+            <a class="p-2 text-white" href="#">Santé</a>
+            <a class="p-2 text-white" href="#">Voyages</a>
+        </nav>
+    </div>
+
+    <!--TOP CONTENT-->
+    <div class="container">
         <div class="jumbotron p-3 p-md-5 text-white rounded bg-dark">
             <div class="col-md-6 px-0">
                 <h1 class="display-4 font-italic">Titre d'un article de blog plus long</h1>
@@ -91,6 +95,7 @@
         </div>
     </div>
 
+    <!--BOT CONTENT-->
     <main role="main" class="container">
         <div class="row">
             <div class="col-md-8 blog-main">
@@ -200,13 +205,53 @@
 
         </div><!-- /.row -->
 
-    </main><!-- /.container -->
+    </main>
 
-    <footer class="blog-footer">
-        <p>Modèle de blog contruit pour <a href="https://getbootstrap.com/">Bootstrap</a> par <a href="https://twitter.com/mdo">@mdo</a>.</p>
-        <p>
-            <a href="#">Revenir en haut</a>
-        </p>
+    <!--FOOTER-->
+    <footer class="pt-4 text-white bg-darkgrey1">
+        <div class="container first-bar">
+            <div class="row">
+                <div class="col-sm-3">
+                    <h5>Get started</h5>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Sign up</a></li>
+                        <li><a href="#">Downloads</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3">
+                    <h5>About us</h5>
+                    <ul>
+                        <li><a href="#">Company Information</a></li>
+                        <li><a href="#">Contact us</a></li>
+                        <li><a href="#">Reviews</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3">
+                    <h5>Support</h5>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Help desk</a></li>
+                        <li><a href="#">Forums</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3 info">
+                    <h5>Information</h5>
+                    <p> Lorem ipsum dolor amet, consectetur adipiscing elit. Etiam consectetur aliquet aliquet. Interdum et malesuada fames ac ante ipsum primis in faucibus. </p>
+                </div>
+            </div>
+        </div>
+        <div class="second-bar bg-darkgrey2">
+            <div class="container">
+                <h2 class="logo py-4"><a href="#"> Loicyeu.fr </a>
+                    <div class="social-icons">
+                        <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="google"><i class="fab fa-google-plus-g"></i></a>
+                    </div>
+                </h2>
+            </div>
+        </div>
     </footer>
 
 </body>
