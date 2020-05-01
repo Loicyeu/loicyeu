@@ -53,6 +53,13 @@
 }
 
 /*******************
+*      GLOBAL      *
+*******************/
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+}
+
+/*******************
 *      HEADER      *
 *******************/
 nav .dropdown .dropdown-item:hover {
@@ -71,6 +78,10 @@ footer a.logo {
 }
 footer h2 {
   margin: 0;
+}
+footer h2 a:hover {
+  text-decoration: none;
+  color: #d2d1d1;
 }
 footer div.second-bar div.social-icons {
   float: right;

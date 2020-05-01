@@ -27,6 +27,13 @@ $colors:
 
 
 /*******************
+*      GLOBAL      *
+*******************/
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+}
+
+/*******************
 *      HEADER      *
 *******************/
 
@@ -55,6 +62,11 @@ footer{
 
     h2{
         margin: 0;
+
+        a:hover{
+            text-decoration: none;
+            color: #d2d1d1;
+        }
     }
 
     div.second-bar{
