@@ -56,6 +56,7 @@ app.get('/login', (req, res) => res.sendFile(path.join(__dirname,'public/login.h
 *  - gestion d'acces des pages Express
 *  - Nodemailer
 *  - Color scheme
+*  - amelioration requete sql
 * */
 
 /*
