@@ -1,0 +1,92 @@
+/*****************************
+*      BACKGROUND-COLOR      *
+*****************************/
+.bg-facebook {
+  background-color: #0077e2;
+}
+
+.bg-twiiter {
+  background-color: #00aced;
+}
+
+.bg-google {
+  background-color: #ef1a1a;
+}
+
+.bg-darkgrey1 {
+  background-color: #3A3F46;
+}
+
+.bg-darkgrey2 {
+  background-color: #33373E;
+}
+
+.bg-lightgrey1 {
+  background-color: #EBE6E5;
+}
+
+/***********************
+*      TEXT-COLOR      *
+***********************/
+.text-facebook {
+  color: #0077e2;
+}
+
+.text-twiiter {
+  color: #00aced;
+}
+
+.text-google {
+  color: #ef1a1a;
+}
+
+.text-darkgrey1 {
+  color: #3A3F46;
+}
+
+.text-darkgrey2 {
+  color: #33373E;
+}
+
+.text-lightgrey1 {
+  color: #EBE6E5;
+}
+
+/*******************
+*      HEADER      *
+*******************/
+nav .dropdown .dropdown-item:hover {
+  background-color: #33373E;
+}
+
+/*******************
+*      FOOTER      *
+*******************/
+footer a {
+  color: #d2d1d1;
+}
+footer a.logo {
+  float: left;
+  font-weight: bold;
+}
+footer h2 {
+  margin: 0;
+}
+footer div.second-bar div.social-icons {
+  float: right;
+}
+footer div.second-bar div.social-icons a {
+  padding-left: 1em;
+  padding-right: 1em;
+}
+footer div.second-bar div.social-icons a.twitter:hover {
+  color: #00aced;
+}
+footer div.second-bar div.social-icons a.facebook:hover {
+  color: #0077e2;
+}
+footer div.second-bar div.social-icons a.google:hover {
+  color: #ef1a1a;
+}
+
+/*# sourceMappingURL=global.css.map */

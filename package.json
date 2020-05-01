@@ -1,0 +1,21 @@
+{
+  "name": "news.loicyeu.fr",
+  "version": "0.0.2",
+  "description": "Les news du site loicyeu.fr",
+  "main": "app.js",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Loicyeu/loicyeu.git"
+  },
+  "author": "loicyeu",
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "mysql": "^2.18.1",
+    "node-gyp": "^6.1.0",
+    "node-pre-gyp": "^0.14.0",
+    "socket.io": "^2.3.0"
+  }
+}
