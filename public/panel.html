@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/global.css">
+    <link rel="stylesheet" href="stylesheets/index.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script src="scripts/global.js"></script>
+    <script src="scripts/panel.js" defer></script>
+    <title>Panel | loicyeu.fr</title>
+</head>
+
+<body class="bg-lightgrey1">
+
+    <!--HEADER-->
+    <header class="blog-header py-3 sticky-top bg-darkgrey2">
+        <div class="row flex-nowrap justify-content-between align-items-center mx-3">
+            <div class="col-4 pt-1">
+                <a class="btn btn-sm btn-outline-secondary" href="https://loicyeu.fr">Messagerie</a>
+            </div>
+            <div class="col-4 text-center d-flex justify-content-center">
+                <a class="blog-header-logo text-white" href="https://news.loicyeu.fr">Loicyeu's News</a>
+            </div>
+            <div class="col-4 d-flex justify-content-end align-items-center">
+                <a class="btn btn-sm btn-outline-secondary" href="login.html">Se connecter</a>
+            </div>
+        </div>
+    </header>
+
+    <!--CONTENT-->
+    <div class="container my-4 p-2 bg-light rounded">
+        <div id="alertArticle"></div>
+        <h3>Nouvel article</h3>
+        <hr>
+        <form class="form" onsubmit="return sumbitArticle()">
+            <div class="form-group">
+                <label for="title">Titre de l'article :</label>
+                <input type="text" id="title" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="corps">Contenu :</label>
+                <div class="btn-toolbar float-right" role="toolbar" aria-label="Toolbar with button groups">
+                    <div class="btn-group mr-2" role="group" aria-label="First group">
+                        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Header 1" onclick="heading1()">
+                            <i class="fas fa-heading"></i>
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Header 2" onclick="heading2()">
+                            <i class="fas fa-heading"></i>2
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Header 3" onclick="heading3()">
+                            <i class="fas fa-heading"></i>3
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Header 4" onclick="heading4()">
+                            <i class="fas fa-heading"></i>4
+                        </button>
+                    </div>
+                    <div class="btn-group mr-2" role="group" aria-label="Second group">
+                        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Bold" onclick="bold()">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Italic" onclick="italic()">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Underline" onclick="underline()">
+                            <i class="fas fa-underline"></i>
+                        </button>
+                    </div>
+                    <div class="btn-group" role="group" aria-label="Third group">
+                        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Code" onclick="code()">
+                            <i class="fas fa-code"></i>
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Carriage return" onclick="carriageReturn()">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+                <textarea class="form-control" id="corps"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="theme">Theme :</label>
+                <select id="theme" class="form-control">
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" class="form-control btn-primary" value="Envoyer l'article">
+            </div>
+        </form>
+    </div>
+
+    <!--FOOTER-->
+    <footer class="pt-4 text-white bg-darkgrey1">
+        <div class="container first-bar">
+            <div class="row">
+                <div class="col-sm-3">
+                    <h5>Commencer</h5>
+                    <ul>
+                        <li><a href="#">Accueil</a></li>
+                        <li><a href="#">Se connecter</a></li>
+                        <li><a href="#">Créer un compte</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3">
+                    <h5>A propos</h5>
+                    <ul>
+                        <li><a href="#">Company Information</a></li>
+                        <li><a href="#">Me contacter</a></li>
+                        <li><a href="#">Commentaires</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3">
+                    <h5>Support</h5>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Conditions Générales d'Utilisation</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-3 info">
+                    <h5>Information</h5>
+                    <p> Loicyeu.fr est un projet qui n'a aucun but lucratif. L'accès est gratuit et libre sous réserve de respecter les lois et juridictions en vigueur.</p>
+                </div>
+            </div>
+        </div>
+        <div class="second-bar bg-darkgrey2">
+            <div class="container">
+                <h2 class="logo py-4"><a href="#"> Loicyeu.fr </a>
+                    <div class="social-icons">
+                        <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="google"><i class="fab fa-google-plus-g"></i></a>
+                    </div>
+                </h2>
+            </div>
+        </div>
+    </footer>
+
+    <!--SCRIPTS-->
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+    </script>
+</body>
+</html>
