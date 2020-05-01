@@ -3,7 +3,6 @@
   "version": "0.0.2",
   "description": "Les news du site loicyeu.fr",
   "main": "app.js",
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Loicyeu/loicyeu.git"
