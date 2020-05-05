@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:link="http://www.w3.org/1999/html">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900,bi">
     <link rel="stylesheet" href="stylesheets/globalColor.css">
     <link rel="stylesheet" href="stylesheets/global.css">
 
@@ -16,15 +17,18 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 
-    <script src="scripts/global.js"></script>
     <script src="scripts/index.js" defer></script>
+    <script src="scripts/global.js"></script>
     <title>Message | loicyeu.fr</title>
 </head>
 <body class="bg-brilliantAzure">
-<div>
+
     <!--NAVBAR-->
     <nav class="navbar navbar-expand-sm bg-darkgrey2 navbar-dark sticky-top">
-        <a class="navbar-brand font-weight-bold" href="https://loicyeu.fr">loicyeu.fr</a>
+        <a class="navbar-brand font-weight-bold" href="https://loicyeu.fr">
+            <img src="images/Logo.png" alt="logo" width="32" height="32" class="rounded-circle">
+            Loicyeu.fr
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -123,38 +127,41 @@
         <div class="container first-bar">
             <div class="row">
                 <div class="col-sm-3">
-                    <h5>Get started</h5>
+                    <h5>Commencer</h5>
                     <ul>
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Sign up</a></li>
-                        <li><a href="#">Downloads</a></li>
+                        <li><a href="#">Accueil</a></li>
+                        <li><a href="#">Se connecter</a></li>
+                        <li><a href="#">Créer un compte</a></li>
                     </ul>
                 </div>
                 <div class="col-sm-3">
-                    <h5>About us</h5>
+                    <h5>A propos</h5>
                     <ul>
                         <li><a href="#">Company Information</a></li>
-                        <li><a href="#">Contact us</a></li>
-                        <li><a href="#">Reviews</a></li>
+                        <li><a href="#">Me contacter</a></li>
+                        <li><a href="#">Commentaires</a></li>
                     </ul>
                 </div>
                 <div class="col-sm-3">
                     <h5>Support</h5>
                     <ul>
                         <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Help desk</a></li>
-                        <li><a href="#">Forums</a></li>
+                        <li><a href="#">Conditions Générales d'Utilisation</a></li>
                     </ul>
                 </div>
                 <div class="col-sm-3 info">
                     <h5>Information</h5>
-                    <p> Lorem ipsum dolor amet, consectetur adipiscing elit. Etiam consectetur aliquet aliquet. Interdum et malesuada fames ac ante ipsum primis in faucibus. </p>
+                    <p> Loicyeu.fr est un projet qui n'a aucun but lucratif. L'accès est gratuit et libre sous réserve de respecter les lois et juridictions en vigueur.</p>
                 </div>
             </div>
         </div>
         <div class="second-bar bg-darkgrey2">
             <div class="container">
-                <h2 class="logo py-4"><a href="#"> Loicyeu.fr </a>
+                <h2 class="logo py-4">
+                    <a href="#" class="align-text-top">
+                        <img src="images/Logo.png" width="32" height="32" alt="logo" class="rounded-circle align-bottom">
+                        Loicyeu.fr
+                    </a>
                     <div class="social-icons">
                         <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
                         <a href="#" class="facebook"><i class="fab fa-facebook-f"></i></a>
@@ -164,7 +171,7 @@
             </div>
         </div>
     </footer>
-</div>
+
 </body>
 
 

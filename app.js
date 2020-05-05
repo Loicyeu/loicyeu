@@ -59,30 +59,6 @@ app.get('/login', (req, res) => res.sendFile(path.join(__dirname,'public/login.h
 *  - amelioration requete sql
 * */
 
-/*
-* NODE MAILER
-* *//*
-let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: "loicyeu@gmail.com",
-        pass: "5!x8Df{4vD"
-    }
-}, function (error, info) {
-    if (error) {
-        console.log(error);
-    } else {
-        console.log('Email sent: ' + info.response);
-    }
-});
-
-let info = transporter.sendMail({
-    from: "Loicyeu.fr",
-    to: "loic.henry2001@gmail.com",
-    subject: "Hello ✔",
-    text: "Hello world?",
-    html: "<h1>Hello world?</h1>"
-})*/
 
 /*
 * FONCTIONS
