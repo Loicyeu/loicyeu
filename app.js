@@ -10,22 +10,10 @@ const http = require('http').createServer(app);
 },app);*/
 const io = require('socket.io')(http); //(https)
 const nodemailer = require('nodemailer');
-const mysql = require('mysql');
 const uuid = require('uuid');
 const bcrypt = require('bcrypt');
 const saltRound = 10;
-
-const con = mysql.createConnection({
-    host: "localhost",
-    user: "loicyeu",
-    password: "123abc+-=",
-    database: "loicyeufr"
-});
-con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected!");
-    createTables();
-});
+const con = require('./config/db');
 
 //https
 http.listen(3000, () => {
@@ -74,13 +62,17 @@ function createDB() {
     });
 }
 function createTables() {
+    const WriteLog = require('./models/WriteLog')
+
     let sql = "CREATE TABLE utilisateur (id INT AUTO_INCREMENT PRIMARY KEY, nom VARCHAR(255), prenom VARCHAR(255), sexe INT, hash VARCHAR(255), email VARCHAR(255), role INT)";
     con.query(sql, function (err) {
         if(err) {
+            WriteLog.throwSQLError(err)
             if (err.code === "ER_TABLE_EXISTS_ERROR") sqlWarning(err);
             else sqlError(err);
         } else sqlInfo("Table 'utilisateur' created");
     });
+
     sql = "CREATE TABLE uuid (id INT, uuid VARCHAR(255), expires BIGINT, PRIMARY KEY (id), FOREIGN KEY (id) REFERENCES utilisateur(id) ON DELETE CASCADE)"
     con.query(sql, function (err) {
         if(err) {
@@ -88,6 +80,7 @@ function createTables() {
             else sqlError(err);
         } else sqlInfo("Table 'uuid' created");
     });
+
     sql = "CREATE TABLE password (id INT, mdp VARCHAR(255), PRIMARY KEY (id), FOREIGN KEY (id) REFERENCES utilisateur (id) ON DELETE CASCADE)"
     con.query(sql, function (err) {
         if(err) {
@@ -96,6 +89,8 @@ function createTables() {
         } else sqlInfo("Table 'password' created");
     });
 }
+
+createTables()
 
 //SQL information functions
 function sqlError(err) {
@@ -151,7 +146,7 @@ io.on('connection', (socket) => {
             }
             else if(result.length === 1) {
                 if(testPasswordHash(mdp, result[0].hash)){
-                    con.query("DELETE FROM uuid WHERE id=" + result[0].id, function (err) {
+                    con.query("DELETE FROM uuid WHERE id=?", [result[0].id], function (err) {
                         if(err) {
                             sqlError(err);
                             consoleInfo("ERR_SQL_ERROR", "loginUser");
