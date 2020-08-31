@@ -50,6 +50,16 @@ footer{
 
     h2{
         margin: 0;
+        font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+
+        a:hover{
+            text-decoration: none;
+            color: #d2d1d1;
+        }
+    }
+
+    h5{
+        font-family: "Playfair Display", Georgia, "Times New Roman", serif;
     }
 
     div.second-bar{

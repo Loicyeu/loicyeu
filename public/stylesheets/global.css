@@ -39,6 +39,14 @@ footer a.logo {
 }
 footer h2 {
   margin: 0;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+}
+footer h2 a:hover {
+  text-decoration: none;
+  color: #d2d1d1;
+}
+footer h5 {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
 }
 footer div.second-bar div.social-icons {
   float: right;
