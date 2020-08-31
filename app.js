@@ -1,27 +1,38 @@
 const express = require('express');
 const app = express();
 const fileUpload = require('express-fileupload');
+const bodyParser = require('body-parser')
 const path = require('path');
-//const fs = require('fs');
 const http = require('http').createServer(app);
-/*const https = require('https').createServer({
-    key: fs.readFileSync("private_key.key"),
-    cert: fs.readFileSync("cer.cer")
-},app);*/
-const io = require('socket.io')(http); //(https)
-const nodemailer = require('nodemailer');
+const io = require('socket.io')(http);
+//const nodemailer = require('nodemailer');
 const uuid = require('uuid');
 const bcrypt = require('bcrypt');
 const saltRound = 10;
 const con = require('./config/db');
+
+//Démarrage log
+const WriteLog = require('./models/WriteLog')
+WriteLog.startServ()
+
+//Moteur de template
+app.set('view engine', 'ejs')
+
+
+//Middleware
+app.use('/assets', express.static('public'));
+app.use('/', express.static('public'));
+app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.json())
+app.use(fileUpload());
+
 
 //https
 http.listen(3000, () => {
     console.log('listening on port : 3000');
 });
 
-app.use(express.static('public'));
-app.use(fileUpload());
+
 app.post('/profil.html', function (req, res) {
     console.log(Object.keys(res));
     if(!req.files || Object.keys(req.files).length===0) {
@@ -90,20 +101,18 @@ function createTables() {
     });
 }
 
-createTables()
-
 //SQL information functions
 function sqlError(err) {
     console.log("[SQL ERROR] Code    : "+err.code
         + "\n[SQL ERROR] Message : " + err.sqlMessage);
-}
+} //fait
 function sqlWarning(err) {
     console.log("[SQL WARNING] Code    : " + err.code
         + "\n[SQL WARNING] Message : " + err.sqlMessage);
 }
 function sqlInfo(info) {
     console.log("[SQL INFO] " + info);
-}
+} //fait
 
 //Global information functions
 function consoleInfo(info, title = "") {
@@ -154,8 +163,8 @@ io.on('connection', (socket) => {
                         }else {
                             const userUUID = uuid.v4();
                             const expires = Date.now() + 14400000;
-                            const sql = "INSERT INTO uuid (id, uuid, expires) VALUES (" + result[0].id + ", \"" + userUUID + "\", " + expires + ")";
-                            con.query(sql, function (err) {
+                            const sql = "INSERT INTO uuid (id, uuid, expires) VALUES (?, ?, ?)";
+                            con.query(sql, [result[0].id, userUUID, expires], function (err) {
                                 if(err) {
                                     sqlError(err);
                                     consoleInfo("ERR_SQL_ERROR", "loginUser");
@@ -203,16 +212,16 @@ io.on('connection', (socket) => {
             consoleInfo("ERR_INVALID_EMAIL", "registerUser");
             return;
         }
-        const sql = "SELECT id FROM utilisateur WHERE email = \"" + email + "\"";
-        con.query(sql, function (err, result) {
+        const sql = "SELECT id FROM utilisateur WHERE email=?";
+        con.query(sql, [email], function (err, result) {
             if(err) {
                 sqlError(err);
                 consoleInfo("ERR_SQL_ERROR", "registerUser");
                 callback(false, "ERR_SQL_ERROR");
             }else if(result.length === 0) {
                 const hash = hashPassword(mdp);
-                const sql2 = "INSERT INTO utilisateur(nom, prenom, hash, email) VALUES (\"" + nom + "\", \"" + prenom + "\", \"" + hash + "\", \"" + email +"\")";
-                con.query(sql2, function (err) {
+                const sql2 = "INSERT INTO utilisateur(nom, prenom, hash, email) VALUES (?, ?, ?, ?)";
+                con.query(sql2, [nom, prenom, hash, email], function (err) {
                     if(err) {
                         sqlError(err);
                         consoleInfo("ERR_SQL_ERROR", "registerUser");
@@ -220,14 +229,14 @@ io.on('connection', (socket) => {
                     }else {
                         callback(true, null);
                         consoleInfo("Create new user : email=" + email, "registerUser");
-                        con.query("SELECT id FROM utilisateur WHERE email=\""+ email +"\"", function (err, result) {
+                        con.query("SELECT id FROM utilisateur WHERE email=?", [email], function (err, result) {
                             if(err) {
                                 sqlError(err);
                                 consoleInfo("ERR_SQL_ERROR", "registerUser");
                                 callback(false, "ERR_SQL_ERROR");
                             }else{
                                 if(result.length===1){
-                                    con.query("CREATE TABLE friend_"+result[0].id+" (f_id INT, message TEXT, status INT, PRIMARY KEY (f_id), FOREIGN KEY (f_id) REFERENCES utilisateur (id) ON DELETE CASCADE);",
+                                    con.query(`CREATE TABLE friend_${result[0].id} (f_id INT, message TEXT, status INT, PRIMARY KEY (f_id), FOREIGN KEY (f_id) REFERENCES utilisateur (id) ON DELETE CASCADE);`,
                                         function (err) {
                                         if(err) {
                                             sqlError(err);
@@ -235,7 +244,7 @@ io.on('connection', (socket) => {
                                             callback(false, "ERR_SQL_ERROR");
                                         }else consoleInfo("Table friend_"+result[0].id+" created", "registerUser");
                                     });
-                                    con.query("INSERT INTO password (id, mdp) VALUES (" + result[0].id + ", \""+ mdp + "\")", function (err) {
+                                    con.query("INSERT INTO password (id, mdp) VALUES (?, ?)", [result[0].id, mdp], function (err) {
                                         if(err) {
                                             sqlError(err);
                                             consoleInfo("ERR_SQL_ERROR", "registerUser");
@@ -264,8 +273,8 @@ io.on('connection', (socket) => {
             consoleInfo("ERR_EMPTY_DATA", "isConnected");
             callback(false, "ERR_EMPTY_DATA");
         }
-        const sql = "SELECT * FROM uuid WHERE uuid=\""+uuid+"\""
-        con.query(sql, function (err, result) {
+        const sql = "SELECT * FROM uuid WHERE uuid=?"
+        con.query(sql, [uuid], function (err, result) {
             if(err) {
                 sqlError(err);
                 consoleInfo("ERR_SQL_ERROR", "isConnected");
@@ -276,7 +285,7 @@ io.on('connection', (socket) => {
                     consoleInfo("ERR_NO_SESSION_FOUND", "isConnected");
                     callback(false, "ERR_NO_SESSION_FOUND");
                 }else if(result[0].expires<Date.now()){
-                    con.query("DELETE FROM uuid WHERE id=" + result[0].id, (err) => {
+                    con.query("DELETE FROM uuid WHERE id=?", [result[0].id], (err) => {
                         if(err) {
                             sqlError(err);
                             consoleInfo("ERR_SQL_ERROR", "isConnected");
@@ -307,8 +316,8 @@ io.on('connection', (socket) => {
             consoleInfo("ERR_NULL_UUID", "userInfo");
             return;
         }
-        const sql = "SELECT id FROM uuid WHERE uuid=\"" + uuid + "\""
-        con.query(sql, function (err, result) {
+        const sql = "SELECT id FROM uuid WHERE uuid=?"
+        con.query(sql, [uuid], function (err, result) {
             if(err) {
                 sqlError(err);
                 consoleInfo("ERR_SQL_ERROR", "userInfo");
@@ -317,8 +326,8 @@ io.on('connection', (socket) => {
             else{
                 if(result.length===1){
                     const id = result[0].id;
-                    const sql2 = "SELECT * FROM utilisateur WHERE id=" + id;
-                    con.query(sql2, function (err, result) {
+                    const sql2 = "SELECT * FROM utilisateur WHERE id=?";
+                    con.query(sql2, [id],function (err, result) {
                         if(err) {
                             sqlError(err);
                             consoleInfo("ERR_SQL_ERROR", "userInfo");
@@ -377,7 +386,7 @@ io.on('connection', (socket) => {
                 callback(false, "ERR_SQL_ERROR");
             }else {
                 if(result.length===1){
-                    con.query("SELECT id FROM utilisateur WHERE id="+result[0].id, function (err, result) {
+                    con.query("SELECT id FROM utilisateur WHERE id=?", [result[0].id], function (err, result) {
                         if(err) {
                             sqlError(err);
                             consoleInfo("ERR_SQL_ERROR", "changeInfo");
@@ -388,12 +397,12 @@ io.on('connection', (socket) => {
                                 const nom = info.hasOwnProperty("nom") ? info.nom : null;
                                 const prenom = info.hasOwnProperty("prenom") ? info.prenom : null;
                                 const sexe = info.hasOwnProperty("sexe") ? info.sexe : null;
-                                const sql = "UPDATE utilisateur SET id=" + id +
+                                const sql = "UPDATE utilisateur SET id=?" +
                                     (nom===null ? "" : ", nom=\"" + nom + "\"") +
                                     (prenom===null ? "" : ", prenom=\"" + prenom + "\"") +
                                     (sexe===null ? "" : ", sexe=" + sexe) +
                                     " WHERE id=" + result[0].id;
-                                con.query(sql, function (err) {
+                                con.query(sql, [id], function (err) {
                                     if(err) {
                                         sqlError(err);
                                         consoleInfo("ERR_SQL_ERROR", "changeInfo");
@@ -439,7 +448,7 @@ io.on('connection', (socket) => {
             consoleInfo("ERR_MISSING_DATA", "changePass");
             return;
         }
-        con.query("SELECT id from uuid WHERE uuid=\""+uuid+"\"", function (err, result) {
+        con.query("SELECT id from uuid WHERE uuid=?", [uuid], function (err, result) {
             if(err) {
                 sqlError(err);
                 consoleInfo("ERR_SQL_ERROR", "changePass");
@@ -447,7 +456,7 @@ io.on('connection', (socket) => {
             }else {
                 if(result.length===1){
                     const id = result[0].id;
-                    con.query("SELECT * FROM utilisateur WHERE id="+id, function (err, result) {
+                    con.query("SELECT * FROM utilisateur WHERE id=?", [id], function (err, result) {
                         if(err) {
                             sqlError(err);
                             consoleInfo("ERR_SQL_ERROR", "changePass");
@@ -457,8 +466,8 @@ io.on('connection', (socket) => {
                                 const user = result[0];
                                 if(testPasswordHash(old_pass, user.hash)) {
                                     const hash = hashPassword(new_pass);
-                                    const sql = "UPDATE utilisateur SET hash=\""+hash+"\" WHERE id="+id;
-                                    con.query(sql, function (err) {
+                                    const sql = "UPDATE utilisateur SET hash=? WHERE id=?";
+                                    con.query(sql, [hash, id], function (err) {
                                         if(err) {
                                             sqlError(err);
                                             consoleInfo("ERR_SQL_ERROR", "changePass");
@@ -466,7 +475,7 @@ io.on('connection', (socket) => {
                                         }else{
                                             callback(true, null);
                                             consoleInfo("Mot de passe changé avec succès pour id: "+id, "changePass");
-                                            con.query("UPDATE password SET mdp=\""+new_pass+"\" WHERE id="+id, (err)=>{
+                                            con.query("UPDATE password SET mdp=? WHERE id=?", [new_pass, id], (err)=>{
                                                 if(err) {
                                                     sqlError(err);
                                                     consoleInfo("ERR_SQL_ERROR", "changePass");
@@ -525,7 +534,7 @@ io.on('connection', (socket) => {
             return;
         }
 
-        con.query("SELECT id FROM uuid WHERE uuid=\"" + uuid + "\"", function (err, result) {
+        con.query("SELECT id FROM uuid WHERE uuid=?", [uuid], function (err, result) {
             if(err) {
                 sqlError(err);
                 consoleInfo("ERR_SQL_ERROR", "addFriend");
@@ -533,7 +542,7 @@ io.on('connection', (socket) => {
             }else {
                 if(result.length===1) {
                     const id = result[0].id;
-                    con.query("SELECT id FROM utilisateur WHERE id="+f_id, function (err, result) {
+                    con.query("SELECT id FROM utilisateur WHERE id=?", [f_id], function (err, result) {
                         if(err) {
                             sqlError(err);
                             consoleInfo("ERR_SQL_ERROR", "addFriend");
@@ -541,15 +550,15 @@ io.on('connection', (socket) => {
                         }else{
                             if(result.length===1){
                                 const f_id = result[0].id;
-                                let sql = "INSERT INTO friend_"+id+" (f_id, message, status) VALUES ("+f_id+", \""+message+"\", 0)";
-                                con.query(sql, (err) =>  {
+                                let sql = `INSERT INTO friend_${id} (f_id, message, status) VALUES (?, ?, ?)`;
+                                con.query(sql, [f_id, message, 0], (err) =>  {
                                     if(err) {
                                         sqlError(err);
                                         consoleInfo("ERR_SQL_ERROR", "addFriend");
                                         callback(false, "ERR_SQL_ERROR");
                                     }else{
-                                        sql = "INSERT INTO friend_"+f_id+" (f_id, message, status) VALUES ("+id+", \""+message+"\", 1)";
-                                        con.query(sql, (err) => {
+                                        sql = `INSERT INTO friend_${f_id} (f_id, message, status) VALUES (?, ?, ?)`;
+                                        con.query(sql, [id, message, 1], (err) => {
                                             if(err) {
                                                 sqlError(err);
                                                 consoleInfo("ERR_SQL_ERROR", "addFriend");

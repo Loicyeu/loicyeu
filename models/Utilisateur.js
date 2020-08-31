@@ -1,11 +1,11 @@
 const con = require('../config/db')
 const WriteLog = require('models/WriteLog')
-const Password = require('password')
+const Password = require('models/Password')
 
 /**
  * Définition du callback
  * @callback requestedCallback
- * @param {Object} response
+ * @param {*} response
  * @param {Object} error
  */
 
@@ -100,19 +100,38 @@ class Utilisateur {
      * @since 0.0.1
      * @param {nom} nom le nom de l'utilisateur
      * @param {prenom} prenom le prenom de l'utilisateur
-     * @param {sexe} sexe le sexe de l'utilisateur : 1=Homme, 2=Femme, 3=Autre
+     * @param {sexe} [sexe=null] le sexe de l'utilisateur : 1=Homme, 2=Femme, 3=Autre
      * @param {password} password le mot de passe de l'utilisateur
      * @param {email} email l'email de l'utilisateur
-     * @param {role} role le role de l'utilisateur
+     * @param {role} [role=0] le role de l'utilisateur
      * @param {requestedCallback} callback
      */
-    static create(nom, prenom, sexe, password, email, role=0, callback) {
+    static create(nom, prenom, sexe=null, password, email, role=0, callback) {
         let hash = Password.hash(password)
         con.query('INSERT INTO utilisateur(nom, prenom, sexe, hash, email, role) VALUES (?, ?, ?, ?, ?, ?)', [nom, prenom, sexe, hash, email, role], function (err, result) {
-            if(err) WriteLog.throw(err)
-            callback(result)
+            if(err) {
+                WriteLog.throwSQLError(err, "Utilisateur.create()")
+                callback(null, err)
+            }
+            callback(result, null)
         });
     }
+
+    /**
+     * Méthode qui permet de supprimer un utilisateur de la base donnée
+     * @param {id} id
+     * @param {requestedCallback} callback
+     */
+    static delete(id, callback) {
+        con.query('DELETE FROM utilisateur WHERE id=?', [id], function (err, result) {
+            if(err) {
+                WriteLog.throwSQLError(err, "Utilisateur.delete()");
+                callback(null, err)
+            }
+        })
+    }
+
+
 
 }
 
