@@ -22,7 +22,7 @@ function loginUser(email, pass) {
     socket.emit("loginUser", email, pass, function (res, err) {
         if(err===null) {
             setCookie("uuid",res.uuid,res.expires);
-            window.location.replace("./index.html");
+            window.location.replace("/");
         }
         else {
             if(err==="ERR_NOT_FOUND_DATA") setAlert("alertLogin", "adresse email ou mot de passe invalide", "Erreur", "warning");

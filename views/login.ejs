@@ -23,19 +23,26 @@
 </head>
 
 <body class="bg-brilliantAzure">
-    <div class="container-fluid p-0">
-        <div class="d-flex align-items-center justify-content-center" style="height: 100vh; width: 100vw;">
-            <article class="bg-white rounded container m-auto p-4">
-                <div class="pb-3">
-                    <img src="images/Logo.png" height="64" width="64" class="m-auto d-block rounded-circle" alt="logo" style="pointer-events: none">
+<div class="container-fluid p-0">
+    <div class="d-flex align-items-center justify-content-center" style="height: 100vh; width: 100vw;">
+        <article class="bg-white rounded container m-auto p-4">
+            <div class="pb-3">
+                <img src="images/Logo.png" height="64" width="64" class="m-auto d-block rounded-circle" alt="logo" style="pointer-events: none">
+            </div>
+            <h4 class="card-title text-center mb-4 mt-1">Connexion à Loicyeu.fr</h4>
+            <hr class="pb-4">
+            <div id="alertAccountCreated"></div>
+            <%if (datas.alertLogin) {%>
+                <div id="alertLogin" class="alert alert-<%= datas.alertLogin.type%>">
+                    <strong><%= datas.alertLogin.title%> : </strong>
+                    <%= datas.alertLogin.text%>
                 </div>
-                <h4 class="card-title text-center mb-4 mt-1">Connexion à Loicyeu.fr</h4>
-                <hr class="pb-4">
-                <div id="alertAccountCreated"></div>
+            <%} else {%>
                 <div id="alertLogin"></div>
+            <%}%>
 
-<!--                onsubmit="return formLogin()"-->
-                <form action="login" method="post">
+            <!--                onsubmit="return formLogin()"-->
+            <form action="login" method="post">
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-prepend">
@@ -56,8 +63,8 @@
                     <button id="loginButton" type="submit" class="btn btn-primary btn-block"> Se connecter </button>
                 </div>
                 <p class="text-center"><a href="register" class="btn">Créer un compte ?</a></p>
-                </form>
-            </article>
-        </div>
+            </form>
+        </article>
     </div>
+</div>
 </body>

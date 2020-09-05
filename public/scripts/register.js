@@ -27,7 +27,7 @@ function registerUser(nom, prenom, mdp, email) {
     socket.emit("registerUser", nom, prenom, mdp, email, function (res, err) {
         if(res) {
             setAlert("alertRegister", "création du compte réussit !\nRedirection dans 5 secondes", "Félicitation", "success");
-            setTimeout(()=>window.location.replace("login.html"),5000);
+            setTimeout(()=>window.location.replace("login"),5000);
         }
         else {
             if(err==="ERR_INVALID_EMAIL") setAlert("alertRegister", "adresse email invalide", "Erreur", "warning");

@@ -1,11 +1,31 @@
 const express = require('express');
 const app = express();
+const session = require('express-session');
+const {
+    PORT = 3000,
+    IN_PROD = false,
+
+    SESS_NAME = process.env.NODE_ENV,
+    SESS_SECRET = '-=-Th3_-_S3cr3et-=-',
+    SESS_LIFETIME = 1000 * 60 * 60 * 2 //TWO HOURS
+} = process.env;
+
+const redirectNotLogged = (req, res, next) => {
+    if(req.session.userUUID===undefined) {
+        res.redirect('/login')
+    } else {
+        next()
+    }
+}
+
 const fileUpload = require('express-fileupload');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 const path = require('path');
+
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const io = require('socket.io')(http); //TODO: delete
 //const nodemailer = require('nodemailer');
+
 const uuid = require('uuid');
 const bcrypt = require('bcrypt');
 const saltRound = 10;
@@ -20,21 +40,65 @@ app.set('view engine', 'ejs')
 
 
 //Middleware
-app.use('/assets', express.static('public'));
-app.use('/', express.static('public'));
-app.use(bodyParser.urlencoded({extended: false}))
-app.use(bodyParser.json())
+app.use(session({
+    name: SESS_NAME,
+    resave: false,
+    saveUninitialized: false,
+    secret: SESS_SECRET,
+    cookie: {
+        maxAge: SESS_LIFETIME,
+        sameSite: true,
+        secure: IN_PROD
+    }
+}));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.use(fileUpload());
 
+app.use('/images', express.static('public/images'));
+app.use('/scripts', express.static('public/scripts'));
+app.use('/stylesheets', express.static('public/stylesheets'));
+// app.use('/', express.static('public')); //DO NOT UNCOMMENT
 
-//https
-http.listen(3000, () => {
-    console.log('listening on port : 3000');
+
+//https TODO: change http to app
+http.listen(PORT, () => {
+    console.log('listening on port : '+ PORT);
 });
 
 
-app.post('/profil.html', function (req, res) {
-    console.log(Object.keys(res));
+/*
+* POST REQUEST
+* */
+app.post('/login', function (req, res) {
+    const {email, password} = req.body;
+    const Login = require("./models/Login");
+
+    new Login(email, password).exists((response, info)=> {
+
+        if(response) {
+            const userUUID = uuid.v4();
+            req.session.userUUID = uuid;
+            Login.login(info, userUUID, SESS_LIFETIME, (result, err) => {
+                if(result) {
+                    res.redirect("/");
+                }else {
+                    res.render('login', {datas: {
+                        alertLogin: err
+                    }});
+                }
+            });
+            return
+        }
+        res.render('login', {datas: {
+            alertLogin: info
+        }});
+    });
+
+})
+
+app.post('/profil', function (req, res) {
+    //console.log(Object.keys(res));
     if(!req.files || Object.keys(req.files).length===0) {
         return res.status(400).sendFile(path.join(__dirname,'public/profil.html'));
     }
@@ -45,11 +109,32 @@ app.post('/profil.html', function (req, res) {
         else res.send('File uploaded !');
     });
 });
-//<input class="form-control-file mt-4 rounded" type="file" name="profilePicture">
+
 
 /*
-app.get('/login', (req, res) => res.sendFile(path.join(__dirname,'public/login.html')));
-*/
+* GET REQUEST
+* */
+app.get('/', redirectNotLogged, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/index.html'))
+});
+
+app.get('/login', (req, res) => {
+    res.render('login', {datas: {}})
+});
+
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/register.html'))
+});
+
+app.get('/profil', redirectNotLogged, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/profil.html'))
+});
+
+app.get('/*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/404.html'))
+});
+
+
 
 /*TODO
 *  - gestion d'acces des pages Express
@@ -62,62 +147,6 @@ app.get('/login', (req, res) => res.sendFile(path.join(__dirname,'public/login.h
 /*
 * FONCTIONS
 * */
-
-//Database functions
-function createDB() {
-    con.query("CREATE DATABASE loicyeufr", function (err, result) {
-        if(err) {
-            if (err.code !== "ER_DB_CREATE_EXISTS") sqlError(err);
-            else sqlWarning(err);
-        } else sqlInfo("Database created");
-    });
-}
-function createTables() {
-    const WriteLog = require('./models/WriteLog')
-
-    let sql = "CREATE TABLE utilisateur (id INT AUTO_INCREMENT PRIMARY KEY, nom VARCHAR(255), prenom VARCHAR(255), sexe INT, hash VARCHAR(255), email VARCHAR(255), role INT)";
-    con.query(sql, function (err) {
-        if(err) {
-            WriteLog.throwSQLError(err)
-            if (err.code === "ER_TABLE_EXISTS_ERROR") sqlWarning(err);
-            else sqlError(err);
-        } else sqlInfo("Table 'utilisateur' created");
-    });
-
-    sql = "CREATE TABLE uuid (id INT, uuid VARCHAR(255), expires BIGINT, PRIMARY KEY (id), FOREIGN KEY (id) REFERENCES utilisateur(id) ON DELETE CASCADE)"
-    con.query(sql, function (err) {
-        if(err) {
-            if (err.code === "ER_TABLE_EXISTS_ERROR") sqlWarning(err);
-            else sqlError(err);
-        } else sqlInfo("Table 'uuid' created");
-    });
-
-    sql = "CREATE TABLE password (id INT, mdp VARCHAR(255), PRIMARY KEY (id), FOREIGN KEY (id) REFERENCES utilisateur (id) ON DELETE CASCADE)"
-    con.query(sql, function (err) {
-        if(err) {
-            if (err.code === "ER_TABLE_EXISTS_ERROR") sqlWarning(err);
-            else sqlError(err);
-        } else sqlInfo("Table 'password' created");
-    });
-}
-
-//SQL information functions
-function sqlError(err) {
-    console.log("[SQL ERROR] Code    : "+err.code
-        + "\n[SQL ERROR] Message : " + err.sqlMessage);
-} //fait
-function sqlWarning(err) {
-    console.log("[SQL WARNING] Code    : " + err.code
-        + "\n[SQL WARNING] Message : " + err.sqlMessage);
-}
-function sqlInfo(info) {
-    console.log("[SQL INFO] " + info);
-} //fait
-
-//Global information functions
-function consoleInfo(info, title = "") {
-    console.log((title!=="" ? "["+title+"]":"[GENERAL INFO]")+ " " + info);
-}
 
 
 //
@@ -138,19 +167,19 @@ io.on('connection', (socket) => {
     //res {uuid, expires} err (String)
     socket.on('loginUser', function (email, mdp, callback) {
         if(typeof callback !== "function") {
-            consoleInfo("ERR_NO_CALLBACK", "loginUser");
+            WriteLog.consoleInfo("ERR_NO_CALLBACK", "loginUser");
             return;
         }
         if(email === "" || mdp === "") {
             callback(false, "ERR_EMPTY_DATA");
-            consoleInfo("ERR_EMPTY_DATA", "loginUser");
+            WriteLog.consoleInfo("ERR_EMPTY_DATA", "loginUser");
             return;
         }
         const sql = "SELECT * FROM utilisateur WHERE email = \""+ email + "\"";
         con.query(sql, function (err, result) {
             if(err) {
                 sqlError(err);
-                consoleInfo("ERR_SQL_ERROR", "loginUser");
+                WriteLog.consoleInfo("ERR_SQL_ERROR", "loginUser");
                 callback(false, "ERR_SQL_ERROR");
             }
             else if(result.length === 1) {
@@ -158,7 +187,7 @@ io.on('connection', (socket) => {
                     con.query("DELETE FROM uuid WHERE id=?", [result[0].id], function (err) {
                         if(err) {
                             sqlError(err);
-                            consoleInfo("ERR_SQL_ERROR", "loginUser");
+                            WriteLog.consoleInfo("ERR_SQL_ERROR", "loginUser");
                             callback(false, "ERR_SQL_ERROR");
                         }else {
                             const userUUID = uuid.v4();
@@ -167,29 +196,29 @@ io.on('connection', (socket) => {
                             con.query(sql, [result[0].id, userUUID, expires], function (err) {
                                 if(err) {
                                     sqlError(err);
-                                    consoleInfo("ERR_SQL_ERROR", "loginUser");
+                                    WriteLog.consoleInfo("ERR_SQL_ERROR", "loginUser");
                                     callback(false, "ERR_SQL_ERROR");
                                 }else {
                                     callback({
                                         uuid: userUUID,
                                         expires: expires
                                     }, null);
-                                    consoleInfo("Connected user with uuid : " + userUUID + " and expire date : " + expires);
+                                    WriteLog.consoleInfo("Connected user with uuid : " + userUUID + " and expire date : " + expires);
                                 }
                             });
                         }
                     });
                 }else{
                     callback(false, "ERR_NOT_FOUND_DATA");
-                    consoleInfo("ERR_NOT_FOUND_DATA : password", "loginUser");
+                    WriteLog.consoleInfo("ERR_NOT_FOUND_DATA : password", "loginUser");
                 }
             }else if(result.length > 1) {
                 callback(false, "ERR_NOT_UNIQUE_EMAIL");
-                consoleInfo("ERR_NOT_UNIQUE_EMAIL", "loginUser");
+                WriteLog.consoleInfo("ERR_NOT_UNIQUE_EMAIL", "loginUser");
             }
             else {
                 callback(false, "ERR_NOT_FOUND_DATA");
-                consoleInfo("ERR_NOT_FOUND_DATA : email", "loginUser");
+                WriteLog.consoleInfo("ERR_NOT_FOUND_DATA : email", "loginUser");
             }
         });
     });
@@ -199,24 +228,24 @@ io.on('connection', (socket) => {
         const regexEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 
         if(typeof callback !== "function") {
-            consoleInfo("ERR_NO_CALLBACK", "registerUser");
+            WriteLog.consoleInfo("ERR_NO_CALLBACK", "registerUser");
             return;
         }
         if(email === "" || mdp === "" || nom === "" || prenom === "") {
             callback(false, "ERR_EMPTY_DATA");
-            consoleInfo("ERR_EMPTY_DATA", "registerUser");
+            WriteLog.consoleInfo("ERR_EMPTY_DATA", "registerUser");
             return;
         }
         if(!regexEmail.test(email)){
             callback(false, "ERR_INVALID_EMAIL");
-            consoleInfo("ERR_INVALID_EMAIL", "registerUser");
+            WriteLog.consoleInfo("ERR_INVALID_EMAIL", "registerUser");
             return;
         }
         const sql = "SELECT id FROM utilisateur WHERE email=?";
         con.query(sql, [email], function (err, result) {
             if(err) {
                 sqlError(err);
-                consoleInfo("ERR_SQL_ERROR", "registerUser");
+                WriteLog.consoleInfo("ERR_SQL_ERROR", "registerUser");
                 callback(false, "ERR_SQL_ERROR");
             }else if(result.length === 0) {
                 const hash = hashPassword(mdp);
@@ -224,15 +253,15 @@ io.on('connection', (socket) => {
                 con.query(sql2, [nom, prenom, hash, email], function (err) {
                     if(err) {
                         sqlError(err);
-                        consoleInfo("ERR_SQL_ERROR", "registerUser");
+                        WriteLog.consoleInfo("ERR_SQL_ERROR", "registerUser");
                         callback(false, "ERR_SQL_ERROR");
                     }else {
                         callback(true, null);
-                        consoleInfo("Create new user : email=" + email, "registerUser");
+                        WriteLog.consoleInfo("Create new user : email=" + email, "registerUser");
                         con.query("SELECT id FROM utilisateur WHERE email=?", [email], function (err, result) {
                             if(err) {
                                 sqlError(err);
-                                consoleInfo("ERR_SQL_ERROR", "registerUser");
+                                WriteLog.consoleInfo("ERR_SQL_ERROR", "registerUser");
                                 callback(false, "ERR_SQL_ERROR");
                             }else{
                                 if(result.length===1){
@@ -240,65 +269,67 @@ io.on('connection', (socket) => {
                                         function (err) {
                                         if(err) {
                                             sqlError(err);
-                                            consoleInfo("ERR_SQL_ERROR", "registerUser");
+                                            WriteLog.consoleInfo("ERR_SQL_ERROR", "registerUser");
                                             callback(false, "ERR_SQL_ERROR");
-                                        }else consoleInfo("Table friend_"+result[0].id+" created", "registerUser");
+                                        }else WriteLog.consoleInfo("Table friend_"+result[0].id+" created", "registerUser");
                                     });
                                     con.query("INSERT INTO password (id, mdp) VALUES (?, ?)", [result[0].id, mdp], function (err) {
                                         if(err) {
                                             sqlError(err);
-                                            consoleInfo("ERR_SQL_ERROR", "registerUser");
+                                            WriteLog.consoleInfo("ERR_SQL_ERROR", "registerUser");
                                             callback(false, "ERR_SQL_ERROR");
-                                        }else consoleInfo("New password stocked : "+mdp, "registerUser");
+                                        }else WriteLog.consoleInfo("New password stocked : "+mdp, "registerUser");
                                     });
-                                }else consoleInfo("ERR_ID_NOT_UNIQUE", "registerUser");
+                                }else WriteLog.consoleInfo("ERR_ID_NOT_UNIQUE", "registerUser");
                             }
                         });
                     }
                 });
             }else{
                 callback(false, "ERR_NOT_UNIQUE_EMAIL");
-                consoleInfo("ERR_NOT_UNIQUE_EMAIL", "registerUser");
+                WriteLog.consoleInfo("ERR_NOT_UNIQUE_EMAIL", "registerUser");
             }
         });
     });
 
     //res (bool) err (String)
     socket.on('isConnected', function (uuid, callback) {
+        callback(true, null);
+        return
         if(typeof callback !== "function") {
-            consoleInfo("ERR_NO_CALLBACK", "isConnected");
+            WriteLog.consoleInfo("ERR_NO_CALLBACK", "isConnected");
             return;
         }
         if(uuid===null || uuid==="") {
-            consoleInfo("ERR_EMPTY_DATA", "isConnected");
+            WriteLog.consoleInfo("ERR_EMPTY_DATA", "isConnected");
             callback(false, "ERR_EMPTY_DATA");
         }
         const sql = "SELECT * FROM uuid WHERE uuid=?"
         con.query(sql, [uuid], function (err, result) {
             if(err) {
                 sqlError(err);
-                consoleInfo("ERR_SQL_ERROR", "isConnected");
+                WriteLog.consoleInfo("ERR_SQL_ERROR", "isConnected");
                 callback(false, "ERR_SQL_ERROR");
             }
             else {
                 if(result.length===0) {
-                    consoleInfo("ERR_NO_SESSION_FOUND", "isConnected");
+                    WriteLog.consoleInfo("ERR_NO_SESSION_FOUND", "isConnected");
                     callback(false, "ERR_NO_SESSION_FOUND");
                 }else if(result[0].expires<Date.now()){
                     con.query("DELETE FROM uuid WHERE id=?", [result[0].id], (err) => {
                         if(err) {
                             sqlError(err);
-                            consoleInfo("ERR_SQL_ERROR", "isConnected");
+                            WriteLog.consoleInfo("ERR_SQL_ERROR", "isConnected");
                             callback(false, "ERR_SQL_ERROR");
                         }
-                        consoleInfo("ERR_EXPIRED_SESSION", "isConnected");
+                        WriteLog.consoleInfo("ERR_EXPIRED_SESSION", "isConnected");
                         callback(false, "ERR_EXPIRED_SESSION");
                     });
                 }else if(result[0].expires>Date.now()){
-                    consoleInfo("Connected user with uuid : " + uuid, "isConnected");
+                    WriteLog.consoleInfo("Connected user with uuid : " + uuid, "isConnected");
                     callback(true, null);
                 }else{
-                    consoleInfo("ERR_UNEXPECTED_ERROR", "isConnected");
+                    WriteLog.consoleInfo("ERR_UNEXPECTED_ERROR", "isConnected");
                     callback(false, "ERR_UNEXPECTED_ERROR");
                 }
             }
@@ -308,19 +339,19 @@ io.on('connection', (socket) => {
     //res {nom, prenom, sexe, email} err (String)
     socket.on('userInfo', function (uuid, callback) {
         if(typeof callback !== "function") {
-            consoleInfo("ERR_NO_CALLBACK", "userInfo");
+            WriteLog.consoleInfo("ERR_NO_CALLBACK", "userInfo");
             return;
         }
         if(uuid===null || uuid==="") {
             callback(false, "ERR_NULL_UUID");
-            consoleInfo("ERR_NULL_UUID", "userInfo");
+            WriteLog.consoleInfo("ERR_NULL_UUID", "userInfo");
             return;
         }
         const sql = "SELECT id FROM uuid WHERE uuid=?"
         con.query(sql, [uuid], function (err, result) {
             if(err) {
                 sqlError(err);
-                consoleInfo("ERR_SQL_ERROR", "userInfo");
+                WriteLog.consoleInfo("ERR_SQL_ERROR", "userInfo");
                 callback(false, "ERR_SQL_ERROR");
             }
             else{
@@ -330,7 +361,7 @@ io.on('connection', (socket) => {
                     con.query(sql2, [id],function (err, result) {
                         if(err) {
                             sqlError(err);
-                            consoleInfo("ERR_SQL_ERROR", "userInfo");
+                            WriteLog.consoleInfo("ERR_SQL_ERROR", "userInfo");
                             callback(false, "ERR_SQL_ERROR");
                         }
                         else{
@@ -342,22 +373,22 @@ io.on('connection', (socket) => {
                                     email: result[0].email
                                 }
                                 callback(res, null);
-                                consoleInfo("userInfo : id="+ result[0].id + " email="+ res.email, "userInfo");
+                                WriteLog.consoleInfo("userInfo : id="+ result[0].id + " email="+ res.email, "userInfo");
                             }else if(result.length>1) {
                                 callback(false, "ERR_ID_NOT_UNIQUE");
-                                consoleInfo("ERR_ID_NOT_UNIQUE", "userInfo");
+                                WriteLog.consoleInfo("ERR_ID_NOT_UNIQUE", "userInfo");
                             }else{
                                 callback(false, "ERR_UNEXPECTED_ERROR");
-                                consoleInfo("ERR_UNEXPECTED_ERROR", "userInfo");
+                                WriteLog.consoleInfo("ERR_UNEXPECTED_ERROR", "userInfo");
                             }
                         }
                     });
                 }else if(result.length>1){
                     callback(false, "ERR_NOT_UNIQUE_UUID");
-                    consoleInfo("ERR_NOT_UNIQUE_UUID", "userInfo");
+                    WriteLog.consoleInfo("ERR_NOT_UNIQUE_UUID", "userInfo");
                 }else{
                     callback(false, "ERR_NOT_FOUND_DATA");
-                    consoleInfo("ERR_NOT_FOUND_DATA", "userInfo");
+                    WriteLog.consoleInfo("ERR_NOT_FOUND_DATA", "userInfo");
                 }
             }
         });
@@ -366,30 +397,30 @@ io.on('connection', (socket) => {
     //res (bool) err (String)
     socket.on('changeInfo', function (info, uuid, callback) {
         if(typeof callback !== "function") {
-            consoleInfo("ERR_NO_CALLBACK", "changeInfo");
+            WriteLog.consoleInfo("ERR_NO_CALLBACK", "changeInfo");
             return;
         }
         if(uuid===null || uuid==="") {
             callback(false, "ERR_NULL_UUID");
-            consoleInfo("ERR_NULL_UUID", "changeInfo");
+            WriteLog.consoleInfo("ERR_NULL_UUID", "changeInfo");
             return;
         }
         if(info==="") {
             callback(false, "ERR_MISSING_DATA");
-            consoleInfo("ERR_MISSING_DATA", "changeInfo");
+            WriteLog.consoleInfo("ERR_MISSING_DATA", "changeInfo");
             return;
         }
         con.query("SELECT id FROM uuid WHERE uuid=\"" + uuid + "\"", function (err, result) {
             if(err) {
                 sqlError(err);
-                consoleInfo("ERR_SQL_ERROR", "changeInfo");
+                WriteLog.consoleInfo("ERR_SQL_ERROR", "changeInfo");
                 callback(false, "ERR_SQL_ERROR");
             }else {
                 if(result.length===1){
                     con.query("SELECT id FROM utilisateur WHERE id=?", [result[0].id], function (err, result) {
                         if(err) {
                             sqlError(err);
-                            consoleInfo("ERR_SQL_ERROR", "changeInfo");
+                            WriteLog.consoleInfo("ERR_SQL_ERROR", "changeInfo");
                             callback(false, "ERR_SQL_ERROR");
                         }else{
                             if(result.length===1) {
@@ -405,28 +436,28 @@ io.on('connection', (socket) => {
                                 con.query(sql, [id], function (err) {
                                     if(err) {
                                         sqlError(err);
-                                        consoleInfo("ERR_SQL_ERROR", "changeInfo");
+                                        WriteLog.consoleInfo("ERR_SQL_ERROR", "changeInfo");
                                         callback(false, "ERR_SQL_ERROR");
                                     }else {
-                                        consoleInfo("Mise a jour profil with id=" + result[0].id, "changeInfo");
+                                        WriteLog.consoleInfo("Mise a jour profil with id=" + result[0].id, "changeInfo");
                                         callback(true, null);
                                     }
                                 });
                             }else if(result.length>1){
                                 callback(false, "ERR_NOT_UNIQUE_ID");
-                                consoleInfo("ERR_NOT_UNIQUE_ID", "changeInfo");
+                                WriteLog.consoleInfo("ERR_NOT_UNIQUE_ID", "changeInfo");
                             }else{
                                 callback(false, "ERR_UNEXPECTED_ERROR");
-                                consoleInfo("ERR_UNEXPECTED_ERROR", "changeInfo");
+                                WriteLog.consoleInfo("ERR_UNEXPECTED_ERROR", "changeInfo");
                             }
                         }
                     });
                 }else if(result.length>1){
                     callback(false, "ERR_NOT_UNIQUE_UUID");
-                    consoleInfo("ERR_NOT_UNIQUE_UUID", "changeInfo");
+                    WriteLog.consoleInfo("ERR_NOT_UNIQUE_UUID", "changeInfo");
                 }else{
                     callback(false, "ERR_NO_SESSION_FOUND");
-                    consoleInfo("ERR_NO_SESSION_FOUND", "changeInfo");
+                    WriteLog.consoleInfo("ERR_NO_SESSION_FOUND", "changeInfo");
                 }
             }
         });
@@ -435,23 +466,23 @@ io.on('connection', (socket) => {
     //res (bool) err (String)
     socket.on('changePass', function (new_pass, old_pass, uuid, callback) {
         if(typeof callback !== "function") {
-            consoleInfo("ERR_NO_CALLBACK", "changePass");
+            WriteLog.consoleInfo("ERR_NO_CALLBACK", "changePass");
             return;
         }
         if(uuid===null || uuid==="") {
             callback(false, "ERR_NULL_UUID");
-            consoleInfo("ERR_NULL_UUID", "changePass");
+            WriteLog.consoleInfo("ERR_NULL_UUID", "changePass");
             return;
         }
         if(new_pass===null || new_pass==="" || old_pass===null || old_pass==="") {
             callback(false, "ERR_MISSING_DATA");
-            consoleInfo("ERR_MISSING_DATA", "changePass");
+            WriteLog.consoleInfo("ERR_MISSING_DATA", "changePass");
             return;
         }
         con.query("SELECT id from uuid WHERE uuid=?", [uuid], function (err, result) {
             if(err) {
                 sqlError(err);
-                consoleInfo("ERR_SQL_ERROR", "changePass");
+                WriteLog.consoleInfo("ERR_SQL_ERROR", "changePass");
                 callback(false, "ERR_SQL_ERROR");
             }else {
                 if(result.length===1){
@@ -459,7 +490,7 @@ io.on('connection', (socket) => {
                     con.query("SELECT * FROM utilisateur WHERE id=?", [id], function (err, result) {
                         if(err) {
                             sqlError(err);
-                            consoleInfo("ERR_SQL_ERROR", "changePass");
+                            WriteLog.consoleInfo("ERR_SQL_ERROR", "changePass");
                             callback(false, "ERR_SQL_ERROR");
                         }else{
                             if(result.length===1){
@@ -470,41 +501,41 @@ io.on('connection', (socket) => {
                                     con.query(sql, [hash, id], function (err) {
                                         if(err) {
                                             sqlError(err);
-                                            consoleInfo("ERR_SQL_ERROR", "changePass");
+                                            WriteLog.consoleInfo("ERR_SQL_ERROR", "changePass");
                                             callback(false, "ERR_SQL_ERROR");
                                         }else{
                                             callback(true, null);
-                                            consoleInfo("Mot de passe changé avec succès pour id: "+id, "changePass");
+                                            WriteLog.consoleInfo("Mot de passe changé avec succès pour id: "+id, "changePass");
                                             con.query("UPDATE password SET mdp=? WHERE id=?", [new_pass, id], (err)=>{
                                                 if(err) {
                                                     sqlError(err);
-                                                    consoleInfo("ERR_SQL_ERROR", "changePass");
+                                                    WriteLog.consoleInfo("ERR_SQL_ERROR", "changePass");
                                                     callback(false, "ERR_SQL_ERROR");
                                                 }else{
-                                                    consoleInfo("Nouveau mot de passe stocké", "changePass");
+                                                    WriteLog.consoleInfo("Nouveau mot de passe stocké", "changePass");
                                                 }
                                             });
                                         }
                                     });
                                 }else{
                                     callback(false, "ERR_PASSWORD_NOT_MATCHING");
-                                    consoleInfo("ERR_PASSWORD_NOT_MATCHING", "changePass");
+                                    WriteLog.consoleInfo("ERR_PASSWORD_NOT_MATCHING", "changePass");
                                 }
                             }else if(result.length>1){
                                 callback(false, "ERR_NOT_UNIQUE_ID");
-                                consoleInfo("ERR_NOT_UNIQUE_ID", "changePass");
+                                WriteLog.consoleInfo("ERR_NOT_UNIQUE_ID", "changePass");
                             }else{
                                 callback(false, "ERR_UNEXPECTED_ERROR");
-                                consoleInfo("ERR_UNEXPECTED_ERROR", "changePass");
+                                WriteLog.consoleInfo("ERR_UNEXPECTED_ERROR", "changePass");
                             }
                         }
                     });
                 }else if(result.length>1){
                     callback(false, "ERR_NOT_UNIQUE_UUID");
-                    consoleInfo("ERR_NOT_UNIQUE_UUID", "changePass");
+                    WriteLog.consoleInfo("ERR_NOT_UNIQUE_UUID", "changePass");
                 }else{
                     callback(false, "ERR_NO_SESSION_FOUND");
-                    consoleInfo("ERR_NO_SESSION_FOUND", "changePass");
+                    WriteLog.consoleInfo("ERR_NO_SESSION_FOUND", "changePass");
                 }
             }
         });
@@ -514,30 +545,30 @@ io.on('connection', (socket) => {
     //UNVERIFIED
     socket.on('addFriend', function (uuid, f_id, message, callback) {
         if(typeof callback !== "function") {
-            consoleInfo("ERR_NO_CALLBACK", "addFriend");
+            WriteLog.consoleInfo("ERR_NO_CALLBACK", "addFriend");
             return;
         }
         if(uuid===null || uuid==="") {
             callback(false, "ERR_NULL_UUID");
-            consoleInfo("ERR_NULL_UUID", "addFriend");
+            WriteLog.consoleInfo("ERR_NULL_UUID", "addFriend");
             return;
         }
 
         if(f_id===null || f_id==="" && message===null || message==="") {
             callback(false, "ERR_MISSING_DATA");
-            consoleInfo("ERR_MISSING_DATA", "addFriend");
+            WriteLog.consoleInfo("ERR_MISSING_DATA", "addFriend");
             return;
         }
         if(typeof f_id !== "number") {
             callback(false, "ERR_INVALID_ID");
-            consoleInfo("ERR_INVALID_ID", "addFriend");
+            WriteLog.consoleInfo("ERR_INVALID_ID", "addFriend");
             return;
         }
 
         con.query("SELECT id FROM uuid WHERE uuid=?", [uuid], function (err, result) {
             if(err) {
                 sqlError(err);
-                consoleInfo("ERR_SQL_ERROR", "addFriend");
+                WriteLog.consoleInfo("ERR_SQL_ERROR", "addFriend");
                 callback(false, "ERR_SQL_ERROR");
             }else {
                 if(result.length===1) {
@@ -545,7 +576,7 @@ io.on('connection', (socket) => {
                     con.query("SELECT id FROM utilisateur WHERE id=?", [f_id], function (err, result) {
                         if(err) {
                             sqlError(err);
-                            consoleInfo("ERR_SQL_ERROR", "addFriend");
+                            WriteLog.consoleInfo("ERR_SQL_ERROR", "addFriend");
                             callback(false, "ERR_SQL_ERROR");
                         }else{
                             if(result.length===1){
@@ -554,37 +585,37 @@ io.on('connection', (socket) => {
                                 con.query(sql, [f_id, message, 0], (err) =>  {
                                     if(err) {
                                         sqlError(err);
-                                        consoleInfo("ERR_SQL_ERROR", "addFriend");
+                                        WriteLog.consoleInfo("ERR_SQL_ERROR", "addFriend");
                                         callback(false, "ERR_SQL_ERROR");
                                     }else{
                                         sql = `INSERT INTO friend_${f_id} (f_id, message, status) VALUES (?, ?, ?)`;
                                         con.query(sql, [id, message, 1], (err) => {
                                             if(err) {
                                                 sqlError(err);
-                                                consoleInfo("ERR_SQL_ERROR", "addFriend");
+                                                WriteLog.consoleInfo("ERR_SQL_ERROR", "addFriend");
                                                 callback(false, "ERR_SQL_ERROR");
                                             }else{
                                                 callback(true, null);
-                                                consoleInfo("Friend request by " + id + "to " + f_id, "addFriend");
+                                                WriteLog.consoleInfo("Friend request by " + id + "to " + f_id, "addFriend");
                                             }
                                         });
                                     }
                                 });
                             }else if(result.length>1){
                                 callback(false, "ERR_NOT_UNIQUE_UUID");
-                                consoleInfo("ERR_NOT_UNIQUE_UUID", "addFriend");
+                                WriteLog.consoleInfo("ERR_NOT_UNIQUE_UUID", "addFriend");
                             }else{
                                 callback(false, "ERR_NO_SESSION_FOUND");
-                                consoleInfo("ERR_NO_SESSION_FOUND", "addFriend");
+                                WriteLog.consoleInfo("ERR_NO_SESSION_FOUND", "addFriend");
                             }
                         }
                     });
                 }else if(result.length>1){
                     callback(false, "ERR_NOT_UNIQUE_UUID");
-                    consoleInfo("ERR_NOT_UNIQUE_UUID", "addFriend");
+                    WriteLog.consoleInfo("ERR_NOT_UNIQUE_UUID", "addFriend");
                 }else{
                     callback(false, "ERR_NO_SESSION_FOUND");
-                    consoleInfo("ERR_NO_SESSION_FOUND", "addFriend");
+                    WriteLog.consoleInfo("ERR_NO_SESSION_FOUND", "addFriend");
                 }
             }
         });

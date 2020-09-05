@@ -1,5 +1,5 @@
 const con = require('../config/db')
-const WriteLog = require('models/WriteLog')
+const WriteLog = require('./WriteLog')
 const bcrypt = require('bcrypt')
 const saltRound = 10
 
@@ -105,6 +105,23 @@ class Password {
      */
     static compare(password, hash) {
         return bcrypt.compareSync(password, hash);
+    }
+
+    /**
+     * Méthode static qui permet de savoir si un mot de passe est valide.
+     * @param {mdp} password Le mot de passe a tester
+     * @returns {{res: boolean, err: string}}
+     */
+    static isValid(password) {
+        const passNumber = new RegExp("[0-9]", "g");
+        const passUppercase = new RegExp("[A-Z]", "g");
+        const passLowercase = new RegExp("[a-z]", "g");
+
+        if(password==="") return {res: false, err: "ERR_PASSWORD_EMPTY"};
+        else if(password.match(passNumber)===null || password.match(passUppercase)===null || password.match(passLowercase)===null) return {res: false, err: "ERR_PASSWORD_INVALID"};
+        else if(password.match(passNumber).length<2 || password.match(passUppercase).length<2 || password.match(passLowercase).length<2) return {res: false, err: "ERR_PASSWORD_INVALID"};
+        else if(password.length<8) return {res: false, err: "ERR_PASSWORD_TOO_SHORT"}
+        else return {res: true, err: ""}
     }
 }
 

@@ -28,7 +28,7 @@ class WriteLog {
      * @param {string} err.sqlMessage
      * @param {string} [title=null] le nom de la fonction ou l'erreur s'est produite
      */
-    static throwSQLError(err, title=null) {
+    static throwSQLError(err, title="") {
         const msg = moment().format("DD/MM/YYYY HH:mm:ss")+" [SQLError] "+err.code+"\n"
             +"                               "+err.sqlMessage
         console.log(msg)
@@ -40,7 +40,7 @@ class WriteLog {
      * @param {string} message le message a log
      * @param {string} [title=null] le nom de la fonction ou l'erreur s'est produite
      */
-    static throwSQLInfo(message, title=null) {
+    static throwSQLInfo(message, title="") {
         const msg = moment().format("DD/MM/YYYY HH:mm:ss")+" [SQLInfo] "+message
         console.log(msg);
         this.writeFile(msg)
@@ -52,9 +52,9 @@ class WriteLog {
      * @param {string} [title = GENERAL_INFO] le titre de l'information a log
      */
     static consoleInfo(info, title) {
-        let msg = (title!=="" ? "["+title+"] ":"[GENERAL INFO] ")+ info
+        let msg = (title!==undefined ? "["+title+"] ":"[GENERAL INFO] ")+ info
         console.log(msg);
-        this.writeFile(msg)
+        this.writeFile(moment().format("DD/MM/YYYY HH:mm:ss") + " " + msg)
     }
 
     /**

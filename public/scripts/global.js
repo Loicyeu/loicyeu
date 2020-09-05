@@ -48,7 +48,7 @@ function isConnected(callback) {
 }
 function disconnect() {
     setCookie("uuid", null);
-    window.location.replace("login.html");
+    window.location.replace("login");
 }
 
 function testPassword(password) {

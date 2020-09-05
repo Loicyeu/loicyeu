@@ -1,10 +1,10 @@
 const con = require('../config/db')
-const WriteLog = require('models/WriteLog')
-const Password = require('models/Password')
+const WriteLog = require('./WriteLog')
+const Password = require('./Password')
 
 /**
  * Définition du callback
- * @callback requestedCallback
+ * @callback requestedCallbackUtilisateur
  * @param {*} response
  * @param {Object} error
  */
@@ -36,6 +36,7 @@ class Utilisateur {
      */
     constructor(row) {
         this.row = row
+        console.log(row)
     }
 
     /**
@@ -104,7 +105,7 @@ class Utilisateur {
      * @param {password} password le mot de passe de l'utilisateur
      * @param {email} email l'email de l'utilisateur
      * @param {role} [role=0] le role de l'utilisateur
-     * @param {requestedCallback} callback
+     * @param {requestedCallbackUtilisateur} callback
      */
     static create(nom, prenom, sexe=null, password, email, role=0, callback) {
         let hash = Password.hash(password)
