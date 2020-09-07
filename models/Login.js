@@ -1,3 +1,10 @@
+/*
+ * Projet loicyeu
+ * Created by Loicyeu <loic.henry2001@gmail.com>
+ * Copyright (c) 2020.
+ * All rights reserved.
+ */
+
 const con = require("./../config/db");
 const WriteLog = require("./WriteLog");
 const Password = require("./Password");
@@ -8,6 +15,13 @@ const Utilisateur = require("./Utilisateur");
  * @callback callback
  */
 
+/**
+ * Classe permettant de connecter un utilisateur au site
+ * @name Login
+ * @author Loicyeu
+ * @version 1.0.0
+ * @copyright Loicyeu 2020
+ */
 class Login {
 
     constructor(email, password) {
@@ -88,15 +102,18 @@ class Login {
     }
 
     /**
-     * Méthode permettant de connecter un Utilisateur passé en paramètre pendant un certain temps.
-     * @param {Utilisateur} user L'utilisateur à connecter.
+     * Méthode permettant de connecter un Utilisateur pendant un certain temps.
+     * @param {Utilisateur|number} user L'utilisateur ou son id, à connecter.
      * @param {UUID} uuid L'UUID de l'utilisateur.
      * @param {number} lifetime Le temps pendant lequel la connection doit être maintenue.
      * @param {callback} callback Le callback
      */
     static login(user, uuid, lifetime, callback) {
+        let id = 0;
+        if(typeof user === "number") id=user;
+        else id=user.id
 
-        con.query("DELETE FROM uuid WHERE id=?", [user.id], function (err) {
+        con.query("DELETE FROM uuid WHERE id=?", [id], function (err) {
             if(err) {
                 WriteLog.throwSQLError(err, "Login.login");
                 callback(false, {
@@ -107,7 +124,7 @@ class Login {
             }else {
                 const expires = Date.now() + lifetime;
                 const sql = "INSERT INTO uuid (id, uuid, expires) VALUES (?, ?, ?)";
-                con.query(sql, [user.id, uuid, expires], function (err) {
+                con.query(sql, [id, uuid, expires], function (err) {
                     if(err) {
                         WriteLog.throwSQLError(err, "Login.login");
                         callback(false, {

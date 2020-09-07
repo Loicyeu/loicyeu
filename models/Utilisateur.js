@@ -36,7 +36,6 @@ class Utilisateur {
      */
     constructor(row) {
         this.row = row
-        console.log(row)
     }
 
     /**

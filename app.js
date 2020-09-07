@@ -88,14 +88,40 @@ app.post('/login', function (req, res) {
                     }});
                 }
             });
-            return
+        }else {
+            res.render('login', {datas: {
+                alertLogin: info
+            }});
         }
-        res.render('login', {datas: {
-            alertLogin: info
-        }});
     });
 
 })
+
+app.post('/register', function (req, res) {
+    const {prenom, nom, email, password1, password2} = req.body;
+    const Register = require('./models/Register');
+    const Login = require('./models/Login');
+
+    new Register(prenom, nom, email, password1, password2).register((response, info) => {
+        if(response) {
+            const userUUID = uuid.v4();
+            req.session.userUUID = uuid;
+            Login.login(info, userUUID, SESS_LIFETIME, (result, err) => {
+                if(result) {
+                    res.redirect("/");
+                }else {
+                    res.render('register', {datas: {
+                        alertRegister: err
+                    }});
+                }
+            });
+        }else {
+            res.render('register', {datas: {
+                alertRegister: info
+            }});
+        }
+    })
+});
 
 app.post('/profil', function (req, res) {
     //console.log(Object.keys(res));
@@ -115,7 +141,7 @@ app.post('/profil', function (req, res) {
 * GET REQUEST
 * */
 app.get('/', redirectNotLogged, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'))
+    res.render('index', {datas: {}})
 });
 
 app.get('/login', (req, res) => {
@@ -123,24 +149,29 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/register.html'))
+    res.render('register', {datas: {}})
 });
 
 app.get('/profil', redirectNotLogged, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/profil.html'))
+    res.render('profil', {datas: {}})
+});
+
+app.get('/disconnect', redirectNotLogged, (req, res) => {
+    req.session.destroy();
+    res.redirect("login");
 });
 
 app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/404.html'))
+    res.render('404');
 });
 
 
 
 /*TODO
-*  - gestion d'acces des pages Express
+*  - gestion d'accès des pages Express
 *  - Nodemailer
 *  - Color scheme
-*  - amelioration requete sql
+*  - amelioration requête sql
 * */
 
 
@@ -223,7 +254,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    //res (bool) err (String)
+    //res (bool) err (String) TODO
     socket.on('registerUser', function (nom, prenom, mdp, email, callback) {
         const regexEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 
@@ -336,7 +367,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    //res {nom, prenom, sexe, email} err (String)
+    //res {nom, prenom, sexe, email} err (String) TODO
     socket.on('userInfo', function (uuid, callback) {
         if(typeof callback !== "function") {
             WriteLog.consoleInfo("ERR_NO_CALLBACK", "userInfo");
@@ -394,7 +425,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    //res (bool) err (String)
+    //res (bool) err (String) TODO
     socket.on('changeInfo', function (info, uuid, callback) {
         if(typeof callback !== "function") {
             WriteLog.consoleInfo("ERR_NO_CALLBACK", "changeInfo");
@@ -463,7 +494,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    //res (bool) err (String)
+    //res (bool) err (String) TODO
     socket.on('changePass', function (new_pass, old_pass, uuid, callback) {
         if(typeof callback !== "function") {
             WriteLog.consoleInfo("ERR_NO_CALLBACK", "changePass");
@@ -541,7 +572,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    //res (bool) err (String)
+    //res (bool) err (String) TODO
     //UNVERIFIED
     socket.on('addFriend', function (uuid, f_id, message, callback) {
         if(typeof callback !== "function") {
