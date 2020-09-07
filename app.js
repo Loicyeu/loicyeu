@@ -78,7 +78,7 @@ app.post('/login', function (req, res) {
 
         if(response) {
             const userUUID = uuid.v4();
-            req.session.userUUID = uuid;
+            req.session.userUUID = userUUID;
             Login.login(info, userUUID, SESS_LIFETIME, (result, err) => {
                 if(result) {
                     res.redirect("/");
@@ -153,7 +153,19 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/profil', redirectNotLogged, (req, res) => {
-    res.render('profil', {datas: {}})
+    const Profil = require("./models/Profil");
+
+    Profil.userInfo(req.session.userUUID, (result, info) => {
+
+        if(result) {
+            res.render('profil', {datas: {
+                userInfo: info
+            }});
+        }else {
+            res.render('profil', {datas: {}});
+        }
+    });
+
 });
 
 app.get('/disconnect', redirectNotLogged, (req, res) => {
@@ -254,7 +266,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    //res (bool) err (String) TODO
+    //res (bool) err (String)
     socket.on('registerUser', function (nom, prenom, mdp, email, callback) {
         const regexEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 
