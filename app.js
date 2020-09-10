@@ -58,6 +58,7 @@ app.use(fileUpload());
 app.use('/images', express.static('public/images'));
 app.use('/scripts', express.static('public/scripts'));
 app.use('/stylesheets', express.static('public/stylesheets'));
+app.use('/sitemap.xml', express.static('public/sitemap.xml'));
 // app.use('/', express.static('public')); //DO NOT UNCOMMENT
 
 
