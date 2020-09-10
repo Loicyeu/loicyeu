@@ -3,9 +3,9 @@ const app = express();
 const session = require('express-session');
 const {
     PORT = 3000,
-    IN_PROD = false,
+    IN_PROD = process.env.NODE_ENV==="production",
 
-    SESS_NAME = process.env.NODE_ENV,
+    SESS_NAME = "loicyeu.fr",
     SESS_SECRET = '-=-Th3_-_S3cr3et-=-',
     SESS_LIFETIME = 1000 * 60 * 60 * 2 //TWO HOURS
 } = process.env;
@@ -58,7 +58,6 @@ app.use(fileUpload());
 app.use('/images', express.static('public/images'));
 app.use('/scripts', express.static('public/scripts'));
 app.use('/stylesheets', express.static('public/stylesheets'));
-app.use('/sitemap.xml', express.static('public/sitemap.xml'));
 // app.use('/', express.static('public')); //DO NOT UNCOMMENT
 
 
@@ -141,6 +140,15 @@ app.post('/profil', function (req, res) {
 /*
 * GET REQUEST
 * */
+
+app.get('/sitemap.xml', (req, res) => {
+    res.sendFile(__dirname + "/public/sitemap.xml");
+})
+app.get('/robot.txt', (req, res) => {
+    res.sendFile(__dirname + "/public/robot.txt");
+})
+
+
 app.get('/', redirectNotLogged, (req, res) => {
     res.render('index', {datas: {}})
 });
