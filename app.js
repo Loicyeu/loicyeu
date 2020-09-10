@@ -379,7 +379,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    //res {nom, prenom, sexe, email} err (String) TODO
+    //res {nom, prenom, sexe, email} err (String)
     socket.on('userInfo', function (uuid, callback) {
         if(typeof callback !== "function") {
             WriteLog.consoleInfo("ERR_NO_CALLBACK", "userInfo");
