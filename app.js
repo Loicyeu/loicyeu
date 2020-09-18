@@ -43,12 +43,11 @@ app.set('view engine', 'ejs')
 //Middleware
 app.use(session({
     name: SESS_NAME,
-    resave: false,
+    resave: true,
     saveUninitialized: false,
     secret: SESS_SECRET,
     cookie: {
         secure: IN_PROD,
-        httpOnly: true,
         maxAge: SESS_LIFETIME,
         sameSite: true,
     }
