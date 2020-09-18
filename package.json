@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "description": "Le site loicyeu.fr",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js",
-    "installDep": "npm install --build-from-source --no-optional"
+    "test": "npm install --build-from-source --no-optional",
+    "start": "nodemon app.js"
   },
   "author": "Loïc HENRY",
   "license": "ISC",
