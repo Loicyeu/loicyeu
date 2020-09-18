@@ -4,9 +4,12 @@ const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const path = require('path');
 const uuid = require('uuid');
+const https = require('https');
+const fs = require('fs');
 
 const app = express();
-app.disable('x-powered-by')
+app.disable('x-powered-by');
+app.set('trust proxy', true);
 const {
     PORT = 3000,
     IN_PROD = true,//process.env.NODE_ENV==="production",
@@ -27,9 +30,14 @@ const redirectNotLogged = (req, res, next) => {
 
 
 //https TODO: change http to app
-app.listen(PORT, () => {
-    console.log('listening on port : '+ PORT);
-});
+https.createServer({
+    key: fs.readFileSync("key.key"),
+    cert: fs.readFileSync("cert.cer")
+}, app).listen(443)
+
+// app.listen(PORT, () => {
+//     console.log('listening on port : '+ PORT);
+// });
 
 
 //Démarrage log
@@ -43,9 +51,10 @@ app.set('view engine', 'ejs')
 //Middleware
 app.use(session({
     name: SESS_NAME,
-    resave: true,
+    resave: false,
     saveUninitialized: false,
     secret: SESS_SECRET,
+    proxy: true,
     cookie: {
         secure: IN_PROD,
         maxAge: SESS_LIFETIME,
