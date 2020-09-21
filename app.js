@@ -1,24 +1,25 @@
 const express = require('express');
+const app = express();
 const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const path = require('path');
 const uuid = require('uuid');
-const https = require('https');
-const fs = require('fs');
 
-const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', true);
+//region const NODE
 const {
     PORT = 3000,
-    IN_PROD = true,//process.env.NODE_ENV==="production",
+    IN_PROD = false,//process.env.NODE_ENV==="production",
 
     SESS_NAME = "loicyeu.fr",
     SESS_SECRET = '-=-Th3_-_S3cr3et-=-',
     SESS_LIFETIME = 1000 * 60 * 60 * 2 //TWO HOURS
 } = process.env;
-
+//endregion
+const sessionStore = new MySQLStore({}, require('./config/db'));
 
 const redirectNotLogged = (req, res, next) => {
     if(req.session.userUUID===undefined) {
@@ -28,16 +29,9 @@ const redirectNotLogged = (req, res, next) => {
     }
 }
 
-
-//https TODO: change http to app
-https.createServer({
-    key: fs.readFileSync("key.key"),
-    cert: fs.readFileSync("cert.cer")
-}, app).listen(443)
-
-// app.listen(PORT, () => {
-//     console.log('listening on port : '+ PORT);
-// });
+app.listen(PORT, () => {
+    console.log('listening on port : '+ PORT);
+});
 
 
 //Démarrage log
@@ -54,6 +48,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     secret: SESS_SECRET,
+    store: sessionStore,
     proxy: true,
     cookie: {
         secure: IN_PROD,
