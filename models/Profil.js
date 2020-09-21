@@ -29,12 +29,7 @@ class Profil {
                         }
                         else{
                             if(result.length===1){
-                                callback(true, {
-                                    nom: result[0].nom,
-                                    prenom: result[0].prenom,
-                                    email: result[0].email,
-                                    sexe: result[0].sexe
-                                });
+                                callback(true, result[0]);
                                 WriteLog.consoleInfo("userInfo : id="+ result[0].id + " email="+ result[0].email, "Profil.userInfo");
                             }else if(result.length>1) {
                                 callback(false, {err: "ERR_ID_NOT_UNIQUE"});

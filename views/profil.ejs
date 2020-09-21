@@ -46,7 +46,7 @@
                             </i>
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-white font-weight-light" href="#" onclick="disconnect()">
+                        <a class="dropdown-item text-white font-weight-light" href="/disconnect">
                             <i class="fas fa-sign-out-alt"></i>
                             Déconnexion
                         </a>
@@ -118,9 +118,9 @@
                                     </div>
                                 </div>
                             </form>
-                            <form class="col-4" method="post" onsubmit="return false" enctype="multipart/form-data">
+                            <form class="col-4" method="post" action="/profil/uploadPicture" enctype="multipart/form-data">
                                 <div class="text-center">
-                                    <img src="images/user.webp" class="border rounded-circle mt-2" width="150" height="150"/>
+                                    <img src="/images/users/profilePicture<%= datas.userInfo.id%>.png" class="border rounded-circle mt-2" width="150" height="150" onerror="this.src='images/user.webp'; this.onerror=null"/>
                                     <div class="form-group">
                                         <label for="profilePicture" class="profilePicture btn btn-light mt-3 mb-0 d-block">
                                             <i class="fas fa-file-upload mr-1"></i>&nbsp;Choisir une photo...

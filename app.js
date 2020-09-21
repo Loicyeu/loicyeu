@@ -60,9 +60,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(fileUpload());
 
-app.use('/images', express.static('public/images'));
-app.use('/scripts', express.static('public/scripts'));
-app.use('/stylesheets', express.static('public/stylesheets'));
+app.use('/', express.static('public/'));
+app.use('/images/users', express.static('uploads/'));
 
 /*
 * POST REQUEST
@@ -71,24 +70,22 @@ app.post('/login', function (req, res) {
     const {email, password} = req.body;
     const Login = require("./models/Login");
 
-    new Login(email, password).exists((response, info)=> {
+    new Login(email, password).exists((response, user)=> {
 
         if(response) {
             const userUUID = uuid.v4();
             req.session.userUUID = userUUID;
-            Login.login(info, userUUID, SESS_LIFETIME, (result, err) => {
+            req.session.userID = user.id;
+            Login.login(user, userUUID, SESS_LIFETIME, (result, err) => {
                 if(result) {
                     res.redirect("/");
                 }else {
-                    res.render('login', {datas: {
-                        alertLogin: err==null?req.session.profilInfo:err,
-                    }});
-                    req.session.profilInfo = null;
+                    res.render('login', {datas: {}});
                 }
             });
         }else {
             res.render('login', {datas: {
-                alertLogin: info
+                alertLogin: user
             }});
         }
     });
@@ -104,6 +101,7 @@ app.post('/register', function (req, res) {
         if(response) {
             const userUUID = uuid.v4();
             req.session.userUUID = uuid;
+            req.session.userID = response.id;
             Login.login(info, userUUID, SESS_LIFETIME, (result, err) => {
                 if(result) {
                     res.redirect("/");
@@ -121,28 +119,29 @@ app.post('/register', function (req, res) {
     })
 });
 
-app.post('/profil', function (req, res) {
+app.post('/profil/uploadPicture', function (req, res) {
     //console.log(Object.keys(res));
     if(!req.files || Object.keys(req.files).length===0) {
         return res.status(400).sendFile(path.join(__dirname,'public/profil.html'));
     }
 
     let file = req.files.profilePicture;
-    file.mv('uploads/file.png', function (err) {
+    file.mv("uploads/profilePicture"+req.session.userID, function (err) {
         if(err) return res.status(500).send(err);
         else res.send('File uploaded !');
     });
 });
 
 app.post('/profil/updateInfo', (req, res) => {
-    console.log(req.body)
     const {nom, prenom, sexe} = req.body;
     if(nom===undefined || prenom===undefined || sexe===undefined) {
-        req.session.profilInfo = {
-            type: "warning",
-            title: "Erreur",
-            text: "Une erreur s'est produite, veuillez recommencer"
-        }
+        //TODO: user URL params
+        //
+        // req.session.profilInfo = {
+        //     type: "warning",
+        //     title: "Erreur",
+        //     text: "Une erreur s'est produite, veuillez recommencer"
+        // }
         res.redirect("/profil")
     }
     if(nom==="" || prenom==="" || sexe==="") {
@@ -153,15 +152,6 @@ app.post('/profil/updateInfo', (req, res) => {
 /*
 * GET REQUEST
 * */
-
-app.get('/sitemap.xml', (req, res) => {
-    res.sendFile(__dirname + "/public/sitemap.xml");
-})
-app.get('/robot.txt', (req, res) => {
-    res.sendFile(__dirname + "/public/robot.txt");
-})
-
-
 app.get('/', redirectNotLogged, (req, res) => {
     res.render('index', {datas: {}})
 });
@@ -180,6 +170,7 @@ app.get('/profil', redirectNotLogged, (req, res) => {
     Profil.userInfo(req.session.userUUID, (result, info) => {
 
         if(result) {
+            console.log(info)
             res.render('profil', {datas: {
                 userInfo: info
             }});
