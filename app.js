@@ -122,13 +122,13 @@ app.post('/register', function (req, res) {
 app.post('/profil/uploadPicture', function (req, res) {
     //console.log(Object.keys(res));
     if(!req.files || Object.keys(req.files).length===0) {
-        return res.status(400).sendFile(path.join(__dirname,'public/profil.html'));
+        return res.status(400).sendFile(path.join(__dirname,'public/profil'));
     }
 
     let file = req.files.profilePicture;
-    file.mv("uploads/profilePicture"+req.session.userID, function (err) {
+    file.mv("uploads/profilePicture"+req.session.userID+".png", function (err) {
         if(err) return res.status(500).send(err);
-        else res.send('File uploaded !');
+        else res.redirect("/profil");
     });
 });
 
