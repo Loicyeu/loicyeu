@@ -71,8 +71,15 @@
                 <div class="tab-content" id="v-pills-tabContent">
                     <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
                         <h3>Modifier ses informations personnelles</h3>
-                        <p class="text-muted">Veuillez remplir uniquement les champs que vous souhaitez changer</p>
-                        <div id="infoAlert"></div>
+                        <p class="text-muted">Veuillez modifier uniquement les champs que vous souhaitez changer</p>
+                        <%if(datas.error!=null){%>
+                        <div class="alert alert-<%=datas.error.type%> alert-dismissible fade show" role="alert">
+                            <strong><%=datas.error.title%> : </strong> <%= datas.error.text%>
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <%}%>
                         <div class="mb-5 row">
                             <form class="col-8 border-right" method="post" action="profil/updateInfo">
                                 <div class="form-group row">
@@ -129,7 +136,7 @@
                                         <input class="form-control-file mt-4" type="file" name="profilePicture" id="profilePicture" onchange="testPP()" accept="image/png, image/jpeg">
                                     </div>
                                     <div class="form-group">
-                                        <input type="submit" id="submitPP" class="btn btn-primary" value="Appliquer la modification" onclick="changePP()" disabled>
+                                        <input type="submit" id="submitPP" class="btn btn-primary" value="Appliquer la modification" disabled>
                                     </div>
                                 </div>
                             </form>

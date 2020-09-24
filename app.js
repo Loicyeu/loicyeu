@@ -1,3 +1,4 @@
+//region CONST
 const express = require('express');
 const app = express();
 const session = require('express-session');
@@ -6,10 +7,12 @@ const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const path = require('path');
 const uuid = require('uuid');
+//endregion CONST
 
+//region APP CONFIG
 app.disable('x-powered-by');
 app.set('trust proxy', true);
-//region const NODE
+
 const {
     PORT = 3000,
     IN_PROD = false,//process.env.NODE_ENV==="production",
@@ -18,8 +21,9 @@ const {
     SESS_SECRET = '-=-Th3_-_S3cr3et-=-',
     SESS_LIFETIME = 1000 * 60 * 60 * 2 //TWO HOURS
 } = process.env;
-//endregion
+
 const sessionStore = new MySQLStore({}, require('./config/db'));
+//endregion APP CONFIG
 
 const redirectNotLogged = (req, res, next) => {
     if(req.session.userUUID===undefined) {
@@ -34,15 +38,16 @@ app.listen(PORT, () => {
 });
 
 
-//Démarrage log
-const WriteLog = require('./models/WriteLog')
+//Démarrage log + Erreurs
+const WriteLog = require('./models/WriteLog');
+const URLError = require('./models/URLError');
 WriteLog.startServ()
 
 //Moteur de template
 app.set('view engine', 'ejs')
 
 
-//Middleware
+//region MIDDLEWARE
 app.use(session({
     name: SESS_NAME,
     resave: false,
@@ -62,10 +67,9 @@ app.use(fileUpload());
 
 app.use('/', express.static('public/'));
 app.use('/images/users', express.static('uploads/'));
+//endregion MIDDLEWARE
 
-/*
-* POST REQUEST
-* */
+//region POST REQUEST
 app.post('/login', function (req, res) {
     const {email, password} = req.body;
     const Login = require("./models/Login");
@@ -120,38 +124,46 @@ app.post('/register', function (req, res) {
 });
 
 app.post('/profil/uploadPicture', function (req, res) {
-    //console.log(Object.keys(res));
-    if(!req.files || Object.keys(req.files).length===0) {
-        return res.status(400).sendFile(path.join(__dirname,'public/profil'));
-    }
+    if(!req.files || Object.keys(req.files).length===0)
+        return res.redirect("/profil?error=fileNotFound");
+    const file = req.files['profilePicture'];
 
-    let file = req.files.profilePicture;
+    if(file.mimetype!=="image/png" && file.mimetype!=="image/jpeg")
+        return res.redirect("/profil?error=fileTypeUnsupported");
+    if(file.size > (1024*1024*5))
+        return res.redirect("/profile?error=fileTooLarge");
+
     file.mv("uploads/profilePicture"+req.session.userID+".png", function (err) {
-        if(err) return res.status(500).send(err);
-        else res.redirect("/profil");
+        if(err)
+            return res.redirect("/profil?error=unexpectedError");
+        else
+            res.redirect("/profil");
     });
 });
 
 app.post('/profil/updateInfo', (req, res) => {
     const {nom, prenom, sexe} = req.body;
     if(nom===undefined || prenom===undefined || sexe===undefined) {
-        //TODO: user URL params
-        //
-        // req.session.profilInfo = {
-        //     type: "warning",
-        //     title: "Erreur",
-        //     text: "Une erreur s'est produite, veuillez recommencer"
-        // }
-        res.redirect("/profil")
+        res.redirect("/profil?error=emptyFiels")
     }
     if(nom==="" || prenom==="" || sexe==="") {
+        res.redirect("/profil?error=emptyFiels")
     }
+
+    const con = require("./config/db");
+    con.query("UPDATE utilisateur SET prenom=?, nom=?, sexe=? WHERE id=?;",
+        [prenom, nom, sexe, req.session.userID], (err)=> {
+        if(err) {
+            WriteLog.throwSQLError(err);
+            return res.redirect("/profil?error=unexpectedError");
+        }
+        res.redirect("/profil");
+
+    })
 })
+//endregion POST REQUEST
 
-
-/*
-* GET REQUEST
-* */
+//region GET REQUEST
 app.get('/', redirectNotLogged, (req, res) => {
     res.render('index', {datas: {}})
 });
@@ -167,12 +179,12 @@ app.get('/register', (req, res) => {
 app.get('/profil', redirectNotLogged, (req, res) => {
     const Profil = require("./models/Profil");
 
-    Profil.userInfo(req.session.userUUID, (result, info) => {
+    Profil.getUserInfo(req.session.userUUID, (result, info) => {
 
         if(result) {
-            console.log(info)
             res.render('profil', {datas: {
-                userInfo: info
+                    userInfo: info,
+                    error: URLError.getDisplayableError(req.query.error)
             }});
         }else {
             res.render('profil', {datas: {}});
@@ -189,16 +201,18 @@ app.get('/disconnect', redirectNotLogged, (req, res) => {
 app.get('/*', (req, res) => {
     res.render('404');
 });
+//endregion GET REQUEST
 
 
-
-/*TODO
-*  - gestion d'accès des pages Express
+/*TODO:
+*  - Refaire gestion erreurs Login + Register
+*  - Update sql table
 *  - Nodemailer
 *  - Color scheme
 *  - amelioration requête sql
 * */
 
+//region SOCKET IO
 // io.on('connection', (socket) => {
 //
 //     //res (bool) err (String) TODO
@@ -359,3 +373,4 @@ app.get('/*', (req, res) => {
 //         });
 //     });
 // });
+//endregion SOCKET IO

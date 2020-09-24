@@ -31,14 +31,3 @@ function testPP() {
         }
     }
 }
-function changePP() {
-    let file = document.getElementById("profilePicture").files;
-    console.log(file);
-    if(file.length===0) alert("y'a r");
-    else {
-        file = file.item(0);
-        console.log(file.name);
-    }
-
-    return false;
-}

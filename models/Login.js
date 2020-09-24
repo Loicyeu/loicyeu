@@ -12,7 +12,7 @@ const Utilisateur = require("./Utilisateur");
 
 /**
  * @typedef {string} UUID
- * @callback callback
+ * @callback Login~requestedCallback
  */
 
 /**
@@ -32,7 +32,7 @@ class Login {
 
     /**
      * Méthode permettant de savoir si les informations (email, password) sont présentes dans la base de données.
-     * @param {callback} callback Le callback permettant de retourner la réponse.
+     * @param {requestedCallback} callback Le callback permettant de retourner la réponse.
      */
     exists(callback) {
         const email = this.email
@@ -106,7 +106,7 @@ class Login {
      * @param {Utilisateur|number} user L'utilisateur ou son id, à connecter.
      * @param {UUID} uuid L'UUID de l'utilisateur.
      * @param {number} lifetime Le temps pendant lequel la connection doit être maintenue.
-     * @param {callback} callback Le callback
+     * @param {requestedCallback} callback Le callback
      */
     static login(user, uuid, lifetime, callback) {
         let id = 0;
@@ -134,7 +134,7 @@ class Login {
                         });
                     }else {
                         WriteLog.consoleInfo("Connected user with uuid : " + uuid + " and expire date : " + expires);
-                        callback(true);
+                        callback(true, {});
                     }
                 });
             }

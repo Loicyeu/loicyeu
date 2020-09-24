@@ -4,20 +4,32 @@
  * Copyright (c) 2020.
  * All rights reserved.
  */
+/**
+ * @class
+ */
+
+/**
+ * @callback Profil~requestedCallback
+ * @param {boolean} result
+ * @param {{err: string}|Object} info
+ */
 
 const con = require('../config/db')
 const WriteLog = require("./WriteLog");
 
 class Profil {
-    constructor() {
-    }
 
-    static userInfo(uuid, callback) {
+    /**
+     * Méthode permettant de changer les informations d'un utilisateur.
+     * @param {string} uuid
+     * @param {requestedCallback} callback
+     */
+    static getUserInfo(uuid, callback) {
 
         con.query("SELECT id FROM uuid WHERE uuid=?", [uuid], function (err, result) {
             if(err) {
                 WriteLog.consoleInfo("ERR_SQL_ERROR", "Profil.userInfo");
-                callback(false, {err: "ERR_SQL_ERROR"});
+                callback(false, {err: "unexpectedError"});
             }
             else{
                 if(result.length===1){
@@ -25,7 +37,7 @@ class Profil {
                     con.query("SELECT * FROM utilisateur WHERE id=?", [id],function (err, result) {
                         if(err) {
                             WriteLog.consoleInfo("ERR_SQL_ERROR", "Profil.userInfo");
-                            callback(false, {err: "ERR_SQL_ERROR"});
+                            callback(false, {err: "unexpectedError"});
                         }
                         else{
                             if(result.length===1){
@@ -33,19 +45,19 @@ class Profil {
                                 WriteLog.consoleInfo("userInfo : id="+ result[0].id + " email="+ result[0].email, "Profil.userInfo");
                             }else if(result.length>1) {
                                 callback(false, {err: "ERR_ID_NOT_UNIQUE"});
-                                WriteLog.consoleInfo("ERR_ID_NOT_UNIQUE", "Profil.userInfo");
+                                WriteLog.consoleInfo("unexpectedError", "Profil.userInfo");
                             }else{
                                 callback(false, {err: "ERR_UNEXPECTED_ERROR"});
-                                WriteLog.consoleInfo("ERR_UNEXPECTED_ERROR", "Profil.userInfo");
+                                WriteLog.consoleInfo("unexpectedError", "Profil.userInfo");
                             }
                         }
                     });
                 }else if(result.length>1){
                     callback(false, {err: "ERR_NOT_UNIQUE_UUID"});
-                    WriteLog.consoleInfo("ERR_NOT_UNIQUE_UUID", "Profil.userInfo");
+                    WriteLog.consoleInfo("unexpectedError", "Profil.userInfo");
                 }else{
                     callback(false, {err: "ERR_NOT_FOUND_DATA"});
-                    WriteLog.consoleInfo("ERR_NOT_FOUND_DATA", "Profil.userInfo");
+                    WriteLog.consoleInfo("unexpectedError", "Profil.userInfo");
                 }
             }
         });
