@@ -1,14 +1,20 @@
+/*
+ * Projet loicyeu
+ * Created by Loicyeu <loic.henry2001@gmail.com>
+ * Copyright (c) 2020.
+ * All rights reserved.
+ */
+
 const moment = require('../config/moment')
 const fs = require('fs')
 const logFile = "./log/logServ.log"
 
 /**
  * Classe permettant la gestion des Erreurs SQL
- * @class
  * @name WriteLog
  * @author Loicyeu
- * @since 0.1.0
- * @copyright Loicyeu 2020
+ * @version 1.0.0
+ * @copyright All right reserved 2020
  */
 class WriteLog {
 

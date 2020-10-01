@@ -4,9 +4,9 @@
  * Copyright (c) 2020.
  * All rights reserved.
  */
-/**
- * @class
- */
+
+const con = require('../config/db')
+const WriteLog = require("./WriteLog");
 
 /**
  * @callback Profil~requestedCallback
@@ -14,9 +14,13 @@
  * @param {{err: string}|Object} info
  */
 
-const con = require('../config/db')
-const WriteLog = require("./WriteLog");
-
+/**
+ * Classe Profil
+ * @name Profil
+ * @author Loicyeu
+ * @version 1.0.0
+ * @copyright All right reserved 2020
+ */
 class Profil {
 
     /**
