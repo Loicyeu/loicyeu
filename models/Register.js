@@ -62,7 +62,7 @@ class Register {
             return;
         }
 
-        con.query("SELECT id FROM utilisateur WHERE email=?", [email], function (err, result) {
+        con.query("SELECT id FROM users WHERE email=?", [email], function (err, result) {
             if(err) {
                 WriteLog.throwSQLError(err, "Register.register");
                 callback(false, {
@@ -72,7 +72,7 @@ class Register {
                 });
             }else if(result.length === 0) {
                 const hash = Password.hash(password1);
-                con.query("INSERT INTO utilisateur(nom, prenom, hash, email) VALUES (?, ?, ?, ?)", [nom, prenom, hash, email], function (err) {
+                con.query("INSERT INTO users(nom, prenom, hash, email) VALUES (?, ?, ?, ?)", [nom, prenom, hash, email], function (err) {
                     if(err) {
                         WriteLog.throwSQLError(err, "Register.register");
                         callback(false, {
@@ -81,7 +81,7 @@ class Register {
                             text: "erreur inattendue"
                         });
                     }else {
-                        con.query("SELECT id FROM utilisateur WHERE email=?", [email], function (err, result) {
+                        con.query("SELECT id FROM users WHERE email=?", [email], function (err, result) {
                             if(err) {
                                 WriteLog.throwSQLError(err, "Register.register");
                                 callback(false, {
@@ -96,7 +96,7 @@ class Register {
                                         id: result[0].id
                                     });
 
-                                    const sql = `CREATE TABLE friend_${result[0].id} (f_id INT, message TEXT, status INT, PRIMARY KEY (f_id), FOREIGN KEY (f_id) REFERENCES utilisateur (id) ON DELETE CASCADE);`;
+                                    const sql = `CREATE TABLE friend_${result[0].id} (f_id INT, message TEXT, status INT, PRIMARY KEY (f_id), FOREIGN KEY (f_id) REFERENCES users (id) ON DELETE CASCADE);`;
                                     con.query(sql, function (err) {
                                             if(err) {
                                                 WriteLog.throwSQLError(err, "Register.register");

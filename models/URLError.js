@@ -5,6 +5,11 @@
  * All rights reserved.
  */
 
+/**
+ * Classe URLError
+ * @version 1.0.0
+ * @copyright Loicyeu 2020
+ */
 class URLError {
 
     /**
@@ -14,6 +19,8 @@ class URLError {
      *
      * @param {string} error L'erreur URL
      * @return {{type: string, title: string, text: string}|null}
+     * @since 1.0.0
+     * @version 1.0.0
      */
     static getDisplayableError(error) {
         switch (error) {

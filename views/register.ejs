@@ -3,6 +3,7 @@
 
 <head>
     <%- include('parts/head');%>
+    <script src="scripts/register.js"></script>
 
     <title>Enregistrement | loicyeu.fr</title>
 </head>
@@ -16,9 +17,6 @@
             </div>
             <h4 class="card-title text-center mb-4 mt-1">Création compte</h4>
             <hr>
-            <div class="alert alert-info">
-                <strong>Information : </strong>les mots de passe sont désormais protégé (SHA-1).
-            </div>
             <%if (datas.alertRegister) {%>
                 <div id="alertRegister" class="alert alert-<%= datas.alertRegister.type%>">
                     <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -66,6 +64,12 @@
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary btn-block"> Créer le compte </button>
+                    <%/*%><small class="form-text text-muted">
+                        En vous inscrivant sur loicyeu.fr vous acceptez les <a href="#" target="_blank">Conditions générales d'utilisation</a>.
+                        Vous pouvez accéder aux données vous concernant, les rectifier ou demander leur effacement.
+                        Vous pouvez à tout moment retirer votre consentement au traitement de vos données.
+                        Pour plus d'information sur vos droit rendez-vous sur le site de la <a href="https://cnil.fr" target="_blank">CNIL</a>.
+                    </small><%*/%>
                 </div>
                 <p class="text-center"><a href="login" class="btn">Se connecter ?</a></p>
             </form>

@@ -11,7 +11,7 @@ const saltRound = 10
  */
 
 /**
- * @typedef {Object} row
+ * @typedef {{id, password}} row
  * @typedef {number} id
  * @typedef {string} mdp
  * @typedef {string} hash

@@ -1,3 +1,19 @@
+/*
+ * Projet loicyeu
+ * Created by Loicyeu <loic.henry2001@gmail.com>
+ * Copyright (c) 2020.
+ * All rights reserved.
+ */
+
+/*TODO:
+*  - Refaire gestion erreurs Login + Register
+*  - On disconnect "target url"
+*  - Update sql table
+*  - Nodemailer
+*  - Color scheme
+*  - amelioration requête sql
+* */
+
 //region CONST
 const express = require('express');
 const app = express();
@@ -5,7 +21,6 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
-const path = require('path');
 const uuid = require('uuid');
 //endregion CONST
 
@@ -63,7 +78,7 @@ app.use(session({
 }));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-app.use(fileUpload());
+app.use(fileUpload({}));
 
 app.use('/', express.static('public/'));
 app.use('/images/users', express.static('uploads/'));
@@ -71,25 +86,19 @@ app.use('/images/users', express.static('uploads/'));
 
 //region POST REQUEST
 app.post('/login', function (req, res) {
-    const {email, password} = req.body;
     const Login = require("./models/Login");
+    const {email, password} = req.body;
 
-    new Login(email, password).exists((response, user)=> {
-
+    new Login(email, password).exists((response, info)=> {
         if(response) {
-            const userUUID = uuid.v4();
-            req.session.userUUID = userUUID;
-            req.session.userID = user.id;
-            Login.login(user, userUUID, SESS_LIFETIME, (result, err) => {
-                if(result) {
-                    res.redirect("/");
-                }else {
-                    res.render('login', {datas: {}});
-                }
-            });
+            req.session.userUUID = uuid.v4();
+            req.session.userID = info.id;
+            res.redirect("/");
+
         }else {
+            console.log(info)
             res.render('login', {datas: {
-                alertLogin: user
+                alertLogin: info
             }});
         }
     });
@@ -151,7 +160,7 @@ app.post('/profil/updateInfo', (req, res) => {
     }
 
     const con = require("./config/db");
-    con.query("UPDATE utilisateur SET prenom=?, nom=?, sexe=? WHERE id=?;",
+    con.query("UPDATE users SET prenom=?, nom=?, sexe=? WHERE id=?;",
         [prenom, nom, sexe, req.session.userID], (err)=> {
         if(err) {
             WriteLog.throwSQLError(err);
@@ -204,13 +213,6 @@ app.get('/*', (req, res) => {
 //endregion GET REQUEST
 
 
-/*TODO:
-*  - Refaire gestion erreurs Login + Register
-*  - Update sql table
-*  - Nodemailer
-*  - Color scheme
-*  - amelioration requête sql
-* */
 
 //region SOCKET IO
 // io.on('connection', (socket) => {

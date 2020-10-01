@@ -34,7 +34,7 @@ class Profil {
             else{
                 if(result.length===1){
                     const id = result[0].id;
-                    con.query("SELECT * FROM utilisateur WHERE id=?", [id],function (err, result) {
+                    con.query("SELECT * FROM users WHERE id=?", [id],function (err, result) {
                         if(err) {
                             WriteLog.consoleInfo("ERR_SQL_ERROR", "Profil.userInfo");
                             callback(false, {err: "unexpectedError"});

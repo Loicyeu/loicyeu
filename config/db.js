@@ -36,7 +36,7 @@ function createTables() {
         } else sqlInfo("Table 'utilisateur' created");
     });
 
-    sql = "CREATE TABLE uuid (id INT, uuid VARCHAR(255), expires BIGINT, PRIMARY KEY (id), FOREIGN KEY (id) REFERENCES utilisateur(id) ON DELETE CASCADE)"
+    sql = "CREATE TABLE uuid (id INT, uuid VARCHAR(255), expires BIGINT, PRIMARY KEY (id), FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE)"
     connection.query(sql, function (err) {
         if(err) {
             if (err.code === "ER_TABLE_EXISTS_ERROR") sqlWarning(err);
@@ -44,7 +44,7 @@ function createTables() {
         } else sqlInfo("Table 'uuid' created");
     });
 
-    sql = "CREATE TABLE password (id INT, mdp VARCHAR(255), PRIMARY KEY (id), FOREIGN KEY (id) REFERENCES utilisateur (id) ON DELETE CASCADE)"
+    sql = "CREATE TABLE password (id INT, mdp VARCHAR(255), PRIMARY KEY (id), FOREIGN KEY (id) REFERENCES users (id) ON DELETE CASCADE)"
     connection.query(sql, function (err) {
         if(err) {
             if (err.code === "ER_TABLE_EXISTS_ERROR") sqlWarning(err);
