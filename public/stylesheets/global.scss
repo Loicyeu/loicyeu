@@ -1,11 +1,6 @@
 $colors:
-    "facebook" #0077e2,
-    "twiiter" #00aced,
-    "google" #ef1a1a,
-
     "darkgrey1" #3A3F46,
-    "darkgrey2" #33373E,
-    "lightgrey1" #EBE6E5;
+    "darkgrey2" #33373E;
 
 /*****************************
 *      BACKGROUND-COLOR      *
@@ -55,6 +50,16 @@ footer{
 
     h2{
         margin: 0;
+        font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+
+        a:hover{
+            text-decoration: none;
+            color: #d2d1d1;
+        }
+    }
+
+    h5{
+        font-family: "Playfair Display", Georgia, "Times New Roman", serif;
     }
 
     div.second-bar{

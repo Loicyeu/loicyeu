@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <%- include('parts/head');%>
+    <script src="scripts/register.js"></script>
+
+    <title>Enregistrement | loicyeu.fr</title>
+</head>
+
+<body class="bg-brilliantAzure">
+<div class="container-fluid p-0">
+    <div class="d-flex align-items-center justify-content-center" style="height: 100vh; width: 100vw;">
+        <article class="bg-white rounded container m-auto p-4">
+            <div class="pb-3">
+                <img src="images/Logo.webp" height="64" width="64" class="m-auto d-block rounded-circle" alt="logo" style="pointer-events: none">
+            </div>
+            <h4 class="card-title text-center mb-4 mt-1">Création compte</h4>
+            <hr>
+            <%if (datas.alertRegister) {%>
+                <div id="alertRegister" class="alert alert-<%= datas.alertRegister.type%>">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong><%= datas.alertRegister.title%> : </strong>
+                    <%= datas.alertRegister.text%>
+                </div>
+            <%}%>
+
+            <form onsubmit="return formRegister()" action="register" method="post">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span id="iconName" class="input-group-text"> <i class="fas fa-user"></i> </span>
+                        </div>
+                        <input name="prenom" id="prenom" class="form-control" type="text" placeholder="Prénom" onkeyup="testName()">
+                        <input name="nom" id="nom" class="form-control" type="text" placeholder="Nom" onkeyup="testName()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span id="iconEmail" class="input-group-text"> <i class="fas fa-at"></i> </span>
+                        </div>
+                        <input name="email" id="email" class="form-control" type="email" placeholder="Adresse email" onkeyup="testEmail()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span id="iconPassword1" class="input-group-text"> <i class="fas fa-lock"></i> </span>
+                        </div>
+                        <input name="password1" id="password1" class="form-control" type="password" placeholder="Mot de passe" onkeyup="testPassword1()">
+                    </div>
+                    <small class="form-text text-muted">
+                        Votre mot de passe doit contenir au moins 8 caractères dont au moins 2 chiffres, 2 majuscules et 2 minuscules.
+                    </small>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span id="iconPassword2" class="input-group-text"> <i class="fas fa-lock"></i> </span>
+                        </div>
+                        <input name="password2" id="password2" class="form-control" type="password" placeholder="Confirmation du mot de passe" onkeyup="testPassword2()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block"> Créer le compte </button>
+                    <%/*%><small class="form-text text-muted">
+                        En vous inscrivant sur loicyeu.fr vous acceptez les <a href="#" target="_blank">Conditions générales d'utilisation</a>.
+                        Vous pouvez accéder aux données vous concernant, les rectifier ou demander leur effacement.
+                        Vous pouvez à tout moment retirer votre consentement au traitement de vos données.
+                        Pour plus d'information sur vos droit rendez-vous sur le site de la <a href="https://cnil.fr" target="_blank">CNIL</a>.
+                    </small><%*/%>
+                </div>
+                <p class="text-center"><a href="login" class="btn">Se connecter ?</a></p>
+            </form>
+        </article>
+    </div>
+</div>
+</body>
+</html>

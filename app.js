@@ -1,254 +1,368 @@
-const express = require('express')
-const app = express()
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-const mysql = require('mysql');
+/*
+ * Projet loicyeu
+ * Created by Loicyeu <loic.henry2001@gmail.com>
+ * Copyright (c) 2020.
+ * All rights reserved.
+ */
+
+/*TODO:
+*  - Refaire gestion erreurs Login + Register
+*  - On disconnect "target url"
+*  - Update sql table
+*  - Nodemailer
+*  - Color scheme
+*  - amelioration requête sql
+* */
+
+//region CONST
+const express = require('express');
+const app = express();
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+const fileUpload = require('express-fileupload');
+const bodyParser = require('body-parser');
 const uuid = require('uuid');
-const bcrypt = require('bcrypt');
-const saltRound = 10;
-const port = 3000
+//endregion CONST
 
-http.listen(port, () => {
-    console.log('listening on port : '+port);
+//region APP CONFIG
+app.disable('x-powered-by');
+app.set('trust proxy', true);
+
+const {
+    PORT = 3000,
+    IN_PROD = false,//process.env.NODE_ENV==="production",
+
+    SESS_NAME = "loicyeu.fr",
+    SESS_SECRET = '-=-Th3_-_S3cr3et-=-',
+    SESS_LIFETIME = 1000 * 60 * 60 * 2 //TWO HOURS
+} = process.env;
+
+const sessionStore = new MySQLStore({}, require('./config/db'));
+//endregion APP CONFIG
+
+const redirectNotLogged = (req, res, next) => {
+    if(req.session.userUUID===undefined) {
+        res.redirect('/login')
+    } else {
+        next()
+    }
+}
+
+app.listen(PORT, () => {
+    console.log('listening on port : '+ PORT);
 });
 
-//app.listen(port, () => console.log(`Listening on port ${port}`))
-app.use(express.static('public'));
 
-const con = mysql.createConnection({
-    host: "localhost",
-    user: "loicyeu",
-    password: "123abc+-=",
-    database: "loicyeufr"
+//Démarrage log + Erreurs
+const WriteLog = require('./models/WriteLog');
+const URLError = require('./models/URLError');
+WriteLog.startServ()
+
+//Moteur de template
+app.set('view engine', 'ejs')
+
+
+//region MIDDLEWARE
+app.use(session({
+    name: SESS_NAME,
+    resave: false,
+    saveUninitialized: false,
+    secret: SESS_SECRET,
+    store: sessionStore,
+    proxy: true,
+    cookie: {
+        secure: IN_PROD,
+        maxAge: SESS_LIFETIME,
+        sameSite: true,
+    }
+}));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+app.use(fileUpload({}));
+
+app.use('/', express.static('public/'));
+app.use('/images/users', express.static('uploads/'));
+//endregion MIDDLEWARE
+
+//region POST REQUEST
+app.post('/login', function (req, res) {
+    const Login = require("./models/Login");
+    const {email, password} = req.body;
+
+    Login.exists(email, password, (response, info) => {
+        if(response) {
+            req.session.userUUID = uuid.v4();
+            req.session.userID = info.id;
+            res.redirect("/");
+
+        }else {
+            console.log(info)
+            res.render('login', {datas: {
+                alertLogin: info
+            }});
+        }
+    });
+
+})
+
+app.post('/register', function (req, res) {
+    const {prenom, nom, email, password1, password2} = req.body;
+    const Register = require('./models/Register');
+
+    new Register(prenom, nom, email, password1, password2).register((response, info) => {
+        if(response) {
+            req.session.userUUID = uuid.v4();
+            req.session.userID = info.id;
+            res.redirect('/');
+        }else {
+            res.render('register', {datas: {
+                alertRegister: info
+            }});
+        }
+    })
 });
-con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected!");
-    createTables();
+
+app.post('/profil/uploadPicture', function (req, res) {
+    if(!req.files || Object.keys(req.files).length===0)
+        return res.redirect("/profil?error=fileNotFound");
+    const file = req.files['profilePicture'];
+
+    if(file.mimetype!=="image/png" && file.mimetype!=="image/jpeg")
+        return res.redirect("/profil?error=fileTypeUnsupported");
+    if(file.size > (1024*1024*5))
+        return res.redirect("/profile?error=fileTooLarge");
+
+    file.mv("uploads/profilePicture"+req.session.userID+".png", function (err) {
+        if(err)
+            return res.redirect("/profil?error=unexpectedError");
+        else
+            res.redirect("/profil");
+    });
 });
 
-/*
-* FONCTIONS
-* */
+app.post('/profil/updateInfo', (req, res) => {
+    const {nom, prenom, sexe} = req.body;
+    if(nom===undefined || prenom===undefined || sexe===undefined) {
+        res.redirect("/profil?error=emptyFiels")
+    }
+    if(nom==="" || prenom==="" || sexe==="") {
+        res.redirect("/profil?error=emptyFiels")
+    }
 
-//Database functions
-function createDB() {
-    con.query("CREATE DATABASE loicyeufr", function (err, result) {
+    const con = require("./config/db");
+    con.query("UPDATE users SET prenom=?, nom=?, sexe=? WHERE id=?;",
+        [prenom, nom, sexe, req.session.userID], (err)=> {
         if(err) {
-            if (err.code !== "ER_DB_CREATE_EXISTS") sqlError(err);
-            else sqlWarning(err);
-        } else sqlInfo("Database created");
-    });
-}
-function createTables() {
-    let sql = "CREATE TABLE theme (id INT AUTO_INCREMENT PRIMARY KEY, theme VARCHAR(255), color VARCHAR(255))";
-    con.query(sql, function (err) {
-        if(err) {
-            if (err.code === "ER_TABLE_EXISTS_ERROR") sqlWarning(err);
-            else sqlError(err);
-        } else sqlInfo("Table 'themes' created");
-    });
-    sql = "CREATE TABLE article (id INT AUTO_INCREMENT PRIMARY KEY, writer INT, date BIGINT, title TEXT, corps MEDIUMTEXT, theme INT, attachment TEXT, FOREIGN KEY (writer) REFERENCES utilisateur(id) ON DELETE CASCADE, FOREIGN KEY (theme) REFERENCES theme(id))"
-    con.query(sql, function (err) {
-        if(err) {
-            if (err.code === "ER_TABLE_EXISTS_ERROR") sqlWarning(err);
-            else sqlError(err);
-        } else sqlInfo("Table 'article' created");
-    });
-}
-
-//SQL information functions
-function sqlError(err) {
-    console.log("[SQL ERROR] Code    : "+err.code
-        + "\n[SQL ERROR] Message : " + err.sqlMessage);
-}
-function sqlWarning(err) {
-    console.log("[SQL WARNING] Code    : " + err.code
-        + "\n[SQL WARNING] Message : " + err.sqlMessage);
-}
-function sqlInfo(info) {
-    console.log("[SQL INFO] " + info);
-}
-
-//Global information functions
-function consoleInfo(info, title = "") {
-    console.log((title!=="" ? "["+title+"]":"[GENERAL INFO]")+ " " + info);
-}
-
-//password
-function hashPassword(pass) {
-    return bcrypt.hashSync(pass, saltRound);
-}
-function testPasswordHash(pass, hash) {
-    return bcrypt.compareSync(pass, hash);
-}
-
-/*
-* SOCKET
-* */
-
-io.on('connection', (socket) => {
-
-    //res {uuid, expires} err (String)
-    socket.on('loginUser', function (email, mdp, callback) {
-        if(typeof callback !== "function") {
-            consoleInfo("ERR_NO_CALLBACK", "loginUser");
-            return;
+            WriteLog.throwSQLError(err);
+            return res.redirect("/profil?error=unexpectedError");
         }
-        if(email === "" || mdp === "") {
-            callback(false, "ERR_EMPTY_DATA");
-            consoleInfo("ERR_EMPTY_DATA", "loginUser");
-            return;
-        }
-        const sql = "SELECT * FROM utilisateur WHERE email = \""+ email + "\"";
-        con.query(sql, function (err, result) {
-            if(err) {
-                sqlError(err);
-                consoleInfo("ERR_SQL_ERROR", "loginUser");
-                callback(false, "ERR_SQL_ERROR");
-            }
-            else if(result.length === 1) {
-                if(testPasswordHash(mdp, result[0].hash)){
-                    con.query("DELETE FROM uuid WHERE id=" + result[0].id, function (err) {
-                        if(err) {
-                            sqlError(err);
-                            consoleInfo("ERR_SQL_ERROR", "loginUser");
-                            callback(false, "ERR_SQL_ERROR");
-                        }else {
-                            const userUUID = uuid.v4();
-                            const expires = Date.now() + 14400000;
-                            const sql = "INSERT INTO uuid (id, uuid, expires) VALUES (" + result[0].id + ", \"" + userUUID + "\", " + expires + ")";
-                            con.query(sql, function (err) {
-                                if(err) {
-                                    sqlError(err);
-                                    consoleInfo("ERR_SQL_ERROR", "loginUser");
-                                    callback(false, "ERR_SQL_ERROR");
-                                }else {
-                                    if(result[0].role>=2){
-                                        callback({
-                                            uuid: userUUID,
-                                            expires: expires
-                                        }, null);
-                                        consoleInfo("Connected user with uuid : " + userUUID + " and expire date : " + expires);
-                                    }else {
-                                        callback(false, "ERR_LIMITED_PERMISSION");
-                                        consoleInfo("Permission insufisantes", "loginUser");
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }else{
-                    callback(false, "ERR_NOT_FOUND_DATA");
-                    consoleInfo("ERR_NOT_FOUND_DATA : password", "loginUser");
-                }
-            }else if(result.length > 1) {
-                callback(false, "ERR_NOT_UNIQUE_EMAIL");
-                consoleInfo("ERR_NOT_UNIQUE_EMAIL", "loginUser");
-            }
-            else {
-                callback(false, "ERR_NOT_FOUND_DATA");
-                consoleInfo("ERR_NOT_FOUND_DATA : email", "loginUser");
-            }
-        });
-    });
+        res.redirect("/profil");
 
-    //res {theme}
-    socket.on('getTheme', function (callback) {
-        if(typeof callback !== "function") {
-            consoleInfo("ERR_NO_CALLBACK", "loginUser");
-            return;
-        }
-        con.query("SELECT * FROM theme", function (err, result) {
-            if(err) {
-                sqlError(err);
-                consoleInfo("ERR_SQL_ERROR", "loginUser");
-                callback(false, "ERR_SQL_ERROR");
-            }else{
-                callback(result, null);
-            }
-        });
-    });
+    })
+})
+//endregion POST REQUEST
 
-    //res (bool)
-    socket.on('sendArticle', function (title, corps, theme, uuid, callback) {
-        if(typeof callback !== "function") {
-            consoleInfo("ERR_NO_CALLBACK", "sendArticle");
-            return;
-        }
-        if(title === "" || corps=== "" || theme==="" || uuid==="") {
-            callback(false, "ERR_EMPTY_DATA");
-            consoleInfo("ERR_EMPTY_DATA", "sendArticle");
-            return;
-        }
-
-        con.query("SELECT id FROM uuid WHERE uuid=\""+uuid+"\"", function (err, result) {
-            if(err) {
-                sqlError(err);
-                consoleInfo("ERR_SQL_ERROR", "sendArticle");
-                callback(false, "ERR_SQL_ERROR");
-            }
-            else if(result.length === 1) {
-                con.query("SELECT * FROM utilisateur WHERE id="+result[0].id, function (err, result) {
-                    if(err) {
-                        sqlError(err);
-                        consoleInfo("ERR_SQL_ERROR", "sendArticle");
-                        callback(false, "ERR_SQL_ERROR");
-                    }else{
-                        if(result.length===1) {
-                            const sql = "INSERT INTO article(writer, date, title, corps, theme) VALUES " +
-                                "("+result[0].id+", "+Date.now()+", \""+title+"\", ?, "+theme+")";
-                            con.query(sql, [corps], function (err) {
-                                if(err){
-                                    sqlError(err);
-                                    consoleInfo("ERR_SQL_ERROR", "sendArticle");
-                                    callback(false, "ERR_SQL_ERROR");
-                                }else{
-                                    callback(true, null);
-                                }
-                            })
-                        }else if(result.length > 1) {
-                            callback(false, "ERR_ID_NOT_UNIQUE");
-                            consoleInfo("ERR_ID_NOT_UNIQUE", "sendArticle");
-                        }
-                        else {
-                            callback(false, "ERR_NOT_FOUND_DATA");
-                            consoleInfo("ERR_NOT_FOUND_DATA", "sendArticle");
-                        }
-                    }
-                });
-            } else if(result.length > 1) {
-                callback(false, "ERR_NOT_UNIQUE_UUID");
-                consoleInfo("ERR_NOT_UNIQUE_UUID", "sendArticle");
-            }
-            else {
-                callback(false, "ERR_NOT_FOUND_DATA");
-                consoleInfo("ERR_NOT_FOUND_DATA", "sendArticle");
-            }
-        });
-    });
-
-    //res (bool)
-    socket.on('getArticle', function (callback) {
-        if(typeof callback !== "function") {
-            consoleInfo("ERR_NO_CALLBACK", "getArticle");
-            return;
-        }
-        const sql="select date, title, corps, t.theme, nom, prenom, color from article a, utilisateur u, theme t where a.writer=u.id and a.theme=t.id;"
-        con.query(sql, function (err, result) {
-            if(err) {
-                sqlError(err);
-                consoleInfo("ERR_SQL_ERROR", "getArticle");
-                callback(false, "ERR_SQL_ERROR");
-            }else{
-                if(result.length===0){
-                    callback(true, null);
-                    consoleInfo("Aucun article trouvé", "getArticle");
-                }else{
-                    callback(result, null);
-                    consoleInfo("Articles trouvés", "getArticle");
-                }
-            }
-        });
-    });
+//region GET REQUEST
+app.get('/', redirectNotLogged, (req, res) => {
+    res.render('index', {datas: {}})
 });
+
+app.get('/login', (req, res) => {
+    res.render('login', {datas: {}})
+});
+
+app.get('/register', (req, res) => {
+    res.render('register', {datas: {}})
+});
+
+app.get('/profil', redirectNotLogged, (req, res) => {
+    const Profil = require("./models/Profil");
+
+    Profil.getUserInfo(req.session.userUUID, (result, info) => {
+
+        if(result) {
+            res.render('profil', {datas: {
+                    userInfo: info,
+                    error: URLError.getDisplayableError(req.query.error)
+            }});
+        }else {
+            res.render('profil', {datas: {}});
+        }
+    });
+
+});
+
+app.get('/disconnect', redirectNotLogged, (req, res) => {
+    req.session.destroy();
+    res.redirect("login");
+});
+
+app.get('/*', (req, res) => {
+    res.render('404');
+});
+//endregion GET REQUEST
+
+
+
+//region SOCKET IO
+// io.on('connection', (socket) => {
+//
+//     //res (bool) err (String) TODO
+//     socket.on('changePass', function (new_pass, old_pass, uuid, callback) {
+//         if(typeof callback !== "function") {
+//             WriteLog.consoleInfo("ERR_NO_CALLBACK", "changePass");
+//             return;
+//         }
+//         if(uuid===null || uuid==="") {
+//             callback(false, "ERR_NULL_UUID");
+//             WriteLog.consoleInfo("ERR_NULL_UUID", "changePass");
+//             return;
+//         }
+//         if(new_pass===null || new_pass==="" || old_pass===null || old_pass==="") {
+//             callback(false, "ERR_MISSING_DATA");
+//             WriteLog.consoleInfo("ERR_MISSING_DATA", "changePass");
+//             return;
+//         }
+//         con.query("SELECT id from uuid WHERE uuid=?", [uuid], function (err, result) {
+//             if(err) {
+//                 sqlError(err);
+//                 WriteLog.consoleInfo("ERR_SQL_ERROR", "changePass");
+//                 callback(false, "ERR_SQL_ERROR");
+//             }else {
+//                 if(result.length===1){
+//                     const id = result[0].id;
+//                     con.query("SELECT * FROM utilisateur WHERE id=?", [id], function (err, result) {
+//                         if(err) {
+//                             sqlError(err);
+//                             WriteLog.consoleInfo("ERR_SQL_ERROR", "changePass");
+//                             callback(false, "ERR_SQL_ERROR");
+//                         }else{
+//                             if(result.length===1){
+//                                 const user = result[0];
+//                                 if(testPasswordHash(old_pass, user.hash)) {
+//                                     const hash = hashPassword(new_pass);
+//                                     const sql = "UPDATE utilisateur SET hash=? WHERE id=?";
+//                                     con.query(sql, [hash, id], function (err) {
+//                                         if(err) {
+//                                             sqlError(err);
+//                                             WriteLog.consoleInfo("ERR_SQL_ERROR", "changePass");
+//                                             callback(false, "ERR_SQL_ERROR");
+//                                         }else{
+//                                             callback(true, null);
+//                                             WriteLog.consoleInfo("Mot de passe changé avec succès pour id: "+id, "changePass");
+//                                             con.query("UPDATE password SET mdp=? WHERE id=?", [new_pass, id], (err)=>{
+//                                                 if(err) {
+//                                                     sqlError(err);
+//                                                     WriteLog.consoleInfo("ERR_SQL_ERROR", "changePass");
+//                                                     callback(false, "ERR_SQL_ERROR");
+//                                                 }else{
+//                                                     WriteLog.consoleInfo("Nouveau mot de passe stocké", "changePass");
+//                                                 }
+//                                             });
+//                                         }
+//                                     });
+//                                 }else{
+//                                     callback(false, "ERR_PASSWORD_NOT_MATCHING");
+//                                     WriteLog.consoleInfo("ERR_PASSWORD_NOT_MATCHING", "changePass");
+//                                 }
+//                             }else if(result.length>1){
+//                                 callback(false, "ERR_NOT_UNIQUE_ID");
+//                                 WriteLog.consoleInfo("ERR_NOT_UNIQUE_ID", "changePass");
+//                             }else{
+//                                 callback(false, "ERR_UNEXPECTED_ERROR");
+//                                 WriteLog.consoleInfo("ERR_UNEXPECTED_ERROR", "changePass");
+//                             }
+//                         }
+//                     });
+//                 }else if(result.length>1){
+//                     callback(false, "ERR_NOT_UNIQUE_UUID");
+//                     WriteLog.consoleInfo("ERR_NOT_UNIQUE_UUID", "changePass");
+//                 }else{
+//                     callback(false, "ERR_NO_SESSION_FOUND");
+//                     WriteLog.consoleInfo("ERR_NO_SESSION_FOUND", "changePass");
+//                 }
+//             }
+//         });
+//     });
+//
+//     //res (bool) err (String) TODO
+//     //UNVERIFIED
+//     socket.on('addFriend', function (uuid, f_id, message, callback) {
+//         if(typeof callback !== "function") {
+//             WriteLog.consoleInfo("ERR_NO_CALLBACK", "addFriend");
+//             return;
+//         }
+//         if(uuid===null || uuid==="") {
+//             callback(false, "ERR_NULL_UUID");
+//             WriteLog.consoleInfo("ERR_NULL_UUID", "addFriend");
+//             return;
+//         }
+//
+//         if(f_id===null || f_id==="" && message===null || message==="") {
+//             callback(false, "ERR_MISSING_DATA");
+//             WriteLog.consoleInfo("ERR_MISSING_DATA", "addFriend");
+//             return;
+//         }
+//         if(typeof f_id !== "number") {
+//             callback(false, "ERR_INVALID_ID");
+//             WriteLog.consoleInfo("ERR_INVALID_ID", "addFriend");
+//             return;
+//         }
+//
+//         con.query("SELECT id FROM uuid WHERE uuid=?", [uuid], function (err, result) {
+//             if(err) {
+//                 sqlError(err);
+//                 WriteLog.consoleInfo("ERR_SQL_ERROR", "addFriend");
+//                 callback(false, "ERR_SQL_ERROR");
+//             }else {
+//                 if(result.length===1) {
+//                     const id = result[0].id;
+//                     con.query("SELECT id FROM utilisateur WHERE id=?", [f_id], function (err, result) {
+//                         if(err) {
+//                             sqlError(err);
+//                             WriteLog.consoleInfo("ERR_SQL_ERROR", "addFriend");
+//                             callback(false, "ERR_SQL_ERROR");
+//                         }else{
+//                             if(result.length===1){
+//                                 const f_id = result[0].id;
+//                                 let sql = `INSERT INTO friend_${id} (f_id, message, status) VALUES (?, ?, ?)`;
+//                                 con.query(sql, [f_id, message, 0], (err) =>  {
+//                                     if(err) {
+//                                         sqlError(err);
+//                                         WriteLog.consoleInfo("ERR_SQL_ERROR", "addFriend");
+//                                         callback(false, "ERR_SQL_ERROR");
+//                                     }else{
+//                                         sql = `INSERT INTO friend_${f_id} (f_id, message, status) VALUES (?, ?, ?)`;
+//                                         con.query(sql, [id, message, 1], (err) => {
+//                                             if(err) {
+//                                                 sqlError(err);
+//                                                 WriteLog.consoleInfo("ERR_SQL_ERROR", "addFriend");
+//                                                 callback(false, "ERR_SQL_ERROR");
+//                                             }else{
+//                                                 callback(true, null);
+//                                                 WriteLog.consoleInfo("Friend request by " + id + "to " + f_id, "addFriend");
+//                                             }
+//                                         });
+//                                     }
+//                                 });
+//                             }else if(result.length>1){
+//                                 callback(false, "ERR_NOT_UNIQUE_UUID");
+//                                 WriteLog.consoleInfo("ERR_NOT_UNIQUE_UUID", "addFriend");
+//                             }else{
+//                                 callback(false, "ERR_NO_SESSION_FOUND");
+//                                 WriteLog.consoleInfo("ERR_NO_SESSION_FOUND", "addFriend");
+//                             }
+//                         }
+//                     });
+//                 }else if(result.length>1){
+//                     callback(false, "ERR_NOT_UNIQUE_UUID");
+//                     WriteLog.consoleInfo("ERR_NOT_UNIQUE_UUID", "addFriend");
+//                 }else{
+//                     callback(false, "ERR_NO_SESSION_FOUND");
+//                     WriteLog.consoleInfo("ERR_NO_SESSION_FOUND", "addFriend");
+//                 }
+//             }
+//         });
+//     });
+// });
+//endregion SOCKET IO

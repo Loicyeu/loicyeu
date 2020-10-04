@@ -1,18 +1,6 @@
 /*****************************
 *      BACKGROUND-COLOR      *
 *****************************/
-.bg-facebook {
-  background-color: #0077e2;
-}
-
-.bg-twiiter {
-  background-color: #00aced;
-}
-
-.bg-google {
-  background-color: #ef1a1a;
-}
-
 .bg-darkgrey1 {
   background-color: #3A3F46;
 }
@@ -21,35 +9,15 @@
   background-color: #33373E;
 }
 
-.bg-lightgrey1 {
-  background-color: #EBE6E5;
-}
-
 /***********************
 *      TEXT-COLOR      *
 ***********************/
-.text-facebook {
-  color: #0077e2;
-}
-
-.text-twiiter {
-  color: #00aced;
-}
-
-.text-google {
-  color: #ef1a1a;
-}
-
 .text-darkgrey1 {
   color: #3A3F46;
 }
 
 .text-darkgrey2 {
   color: #33373E;
-}
-
-.text-lightgrey1 {
-  color: #EBE6E5;
 }
 
 /*******************
@@ -71,6 +39,14 @@ footer a.logo {
 }
 footer h2 {
   margin: 0;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+}
+footer h2 a:hover {
+  text-decoration: none;
+  color: #d2d1d1;
+}
+footer h5 {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
 }
 footer div.second-bar div.social-icons {
   float: right;
