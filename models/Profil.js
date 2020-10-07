@@ -25,49 +25,28 @@ class Profil {
 
     /**
      * Méthode permettant de changer les informations d'un utilisateur.
-     * @param {string} uuid
+     * @param {number} id L'id
      * @param {requestedCallback} callback
      */
-    static getUserInfo(uuid, callback) {
+    static getUserInfo(id, callback) {
 
-        con.query("SELECT id FROM uuid WHERE uuid=?", [uuid], function (err, result) {
+        con.query("SELECT * FROM users WHERE id=?", [id],function (err, result) {
             if(err) {
                 WriteLog.consoleInfo("ERR_SQL_ERROR", "Profil.userInfo");
                 callback(false, {err: "unexpectedError"});
-            }
-            else{
+            }else {
                 if(result.length===1){
-                    const id = result[0].id;
-                    con.query("SELECT * FROM users WHERE id=?", [id],function (err, result) {
-                        if(err) {
-                            WriteLog.consoleInfo("ERR_SQL_ERROR", "Profil.userInfo");
-                            callback(false, {err: "unexpectedError"});
-                        }
-                        else{
-                            if(result.length===1){
-                                callback(true, result[0]);
-                                WriteLog.consoleInfo("userInfo : id="+ result[0].id + " email="+ result[0].email, "Profil.userInfo");
-                            }else if(result.length>1) {
-                                callback(false, {err: "ERR_ID_NOT_UNIQUE"});
-                                WriteLog.consoleInfo("unexpectedError", "Profil.userInfo");
-                            }else{
-                                callback(false, {err: "ERR_UNEXPECTED_ERROR"});
-                                WriteLog.consoleInfo("unexpectedError", "Profil.userInfo");
-                            }
-                        }
-                    });
-                }else if(result.length>1){
-                    callback(false, {err: "ERR_NOT_UNIQUE_UUID"});
+                    callback(true, result[0]);
+                    WriteLog.consoleInfo("userInfo : id="+ result[0].id + " email="+ result[0].email, "Profil.userInfo");
+                }else if(result.length>1) {
+                    callback(false, {err: "ERR_ID_NOT_UNIQUE"});
                     WriteLog.consoleInfo("unexpectedError", "Profil.userInfo");
                 }else{
-                    callback(false, {err: "ERR_NOT_FOUND_DATA"});
+                    callback(false, {err: "ERR_UNEXPECTED_ERROR"});
                     WriteLog.consoleInfo("unexpectedError", "Profil.userInfo");
                 }
             }
         });
-
-
-
     }
 }
 

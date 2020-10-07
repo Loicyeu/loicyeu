@@ -176,9 +176,10 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/profil', redirectNotLogged, (req, res) => {
+    console.log(req.session)
     const Profil = require("./models/Profil");
 
-    Profil.getUserInfo(req.session.userUUID, (result, info) => {
+    Profil.getUserInfo(req.session.userID, (result, info) => {
 
         if(result) {
             res.render('profil', {datas: {

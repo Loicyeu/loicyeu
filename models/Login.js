@@ -33,7 +33,7 @@ class Login {
      * @since 1.0.0
      * @version 1.2.0
      */
-    exists(email, password, callback) {
+    static exists(email, password, callback) {
 
         //region VERIFS
         if(email === "" || password === "") {
