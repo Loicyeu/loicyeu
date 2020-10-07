@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/global.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script src="scripts/global.js" async></script>
+    <script src="scripts/login.js" defer></script>
+    <title>Connexion | loicyeu.fr</title>
+</head>
+
+<body class="bg-lightgrey1">
+    <div class="container-fluid p-0">
+        <div class="d-flex align-items-center justify-content-center" style="height: 100vh; width: 100vw;">
+            <article class="bg-white rounded w-25 m-auto p-4">
+                <h4 class="card-title text-center mb-4 mt-1">Connexion</h4>
+                <hr>
+                <div id="alertAccountCreated"></div>
+                <div id="alertLogin"></div>
+
+                <form onsubmit="return formLogin()">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                        </div>
+                        <input id="email" class="form-control" placeholder="Email" type="email" required autofocus>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                        </div>
+                        <input id="password" class="form-control" placeholder="Mot de passe" type="password" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button id="loginButton" type="submit" class="btn btn-primary btn-block"> Se connecter </button>
+                </div>
+                </form>
+            </article>
+        </div>
+    </div>
+</body>
