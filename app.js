@@ -89,7 +89,7 @@ app.post('/login', function (req, res) {
     const Login = require("./models/Login");
     const {email, password} = req.body;
 
-    new Login(email, password).exists((response, info)=> {
+    Login.exists(email, password, (response, info) => {
         if(response) {
             req.session.userUUID = uuid.v4();
             req.session.userID = info.id;
@@ -108,22 +108,12 @@ app.post('/login', function (req, res) {
 app.post('/register', function (req, res) {
     const {prenom, nom, email, password1, password2} = req.body;
     const Register = require('./models/Register');
-    const Login = require('./models/Login');
 
     new Register(prenom, nom, email, password1, password2).register((response, info) => {
         if(response) {
-            const userUUID = uuid.v4();
-            req.session.userUUID = uuid;
-            req.session.userID = response.id;
-            Login.login(info, userUUID, SESS_LIFETIME, (result, err) => {
-                if(result) {
-                    res.redirect("/");
-                }else {
-                    res.render('register', {datas: {
-                        alertRegister: err
-                    }});
-                }
-            });
+            req.session.userUUID = uuid.v4();
+            req.session.userID = info.id;
+            res.redirect('/');
         }else {
             res.render('register', {datas: {
                 alertRegister: info

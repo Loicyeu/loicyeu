@@ -7,8 +7,10 @@
 
 /**
  * Classe URLError
+ * @class URLError
+ * @author Loicyeu
  * @version 1.0.0
- * @copyright Loicyeu 2020
+ * @copyright All right reserved 2020
  */
 class URLError {
 

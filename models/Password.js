@@ -1,3 +1,10 @@
+/*
+ * Projet loicyeu
+ * Created by Loicyeu <loic.henry2001@gmail.com>
+ * Copyright (c) 2020.
+ * All rights reserved.
+ */
+
 const con = require('../config/db')
 const WriteLog = require('./WriteLog')
 const bcrypt = require('bcrypt')
@@ -11,18 +18,11 @@ const saltRound = 10
  */
 
 /**
- * @typedef {{id, password}} row
- * @typedef {number} id
- * @typedef {string} mdp
- * @typedef {string} hash
- */
-
-/**
  * Classe représentant un mot de passe dans la base de données
  * @name Password
  * @author Loicyeu
- * @since 0.1.0
- * @copyright Loicyeu 2020
+ * @version 1.0.0
+ * @copyright All right reserved 2020
  */
 class Password {
 

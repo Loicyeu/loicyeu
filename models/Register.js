@@ -1,7 +1,28 @@
+/*
+ * Projet loicyeu
+ * Created by Loicyeu <loic.henry2001@gmail.com>
+ * Copyright (c) 2020.
+ * All rights reserved.
+ */
+
 const con = require('./../config/db')
 const WriteLog = require('./WriteLog')
 const Password = require("./Password");
+const MySQLError = require("./MySQLError");
 
+/**
+ * @callback Register~requestedCallback
+ * @param {boolean} response
+ * @param {*} info
+ */
+
+/**
+ * Classe Register
+ * @name Register
+ * @author Loicyeu
+ * @version 1.2.0
+ * @copyright All right reserved 2020
+ */
 class Register {
     constructor(prenom, nom, email, password1, password2) {
         this.prenom = prenom;
@@ -11,11 +32,17 @@ class Register {
         this.password2 = password2;
     }
 
-
+    /**
+     * Methode permettant de créer un nouvel Utilisateur
+     * @param {requestedCallback} callback Le callback
+     * @since 1.0.0
+     * @version 1.2.0
+     */
     register(callback) {
         const {prenom, nom, email, password1, password2} = this;
         const regexEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 
+        //region VERIFS
         if(nom === "" || prenom === "" || email === "" || password1 === "" || password2=== "") {
             WriteLog.consoleInfo("ERR_EMPTY_DATA", "Register.register");
             callback(false, {
@@ -61,68 +88,16 @@ class Register {
             });
             return;
         }
+        //endregion VERIFS
+        const hash = Password.hash(password1);
 
-        con.query("SELECT id FROM users WHERE email=?", [email], function (err, result) {
+        con.query("CALL create_user(?, ?, ?, ?)", [nom, prenom, email, hash], (err, result)=>{
             if(err) {
-                WriteLog.throwSQLError(err, "Register.register");
-                callback(false, {
-                    type: "danger",
-                    title: "Alerte",
-                    text: "erreur inattendue"
-                });
-            }else if(result.length === 0) {
-                const hash = Password.hash(password1);
-                con.query("INSERT INTO users(nom, prenom, hash, email) VALUES (?, ?, ?, ?)", [nom, prenom, hash, email], function (err) {
-                    if(err) {
-                        WriteLog.throwSQLError(err, "Register.register");
-                        callback(false, {
-                            type: "danger",
-                            title: "Alerte",
-                            text: "erreur inattendue"
-                        });
-                    }else {
-                        con.query("SELECT id FROM users WHERE email=?", [email], function (err, result) {
-                            if(err) {
-                                WriteLog.throwSQLError(err, "Register.register");
-                                callback(false, {
-                                    type: "danger",
-                                    title: "Alerte",
-                                    text: "erreur inattendue"
-                                });
-                            }else{
-                                if(result.length===1){
-                                    WriteLog.consoleInfo("Created new user : email=" + email, "Register.register");
-                                    callback(true, {
-                                        id: result[0].id
-                                    });
-
-                                    const sql = `CREATE TABLE friend_${result[0].id} (f_id INT, message TEXT, status INT, PRIMARY KEY (f_id), FOREIGN KEY (f_id) REFERENCES users (id) ON DELETE CASCADE);`;
-                                    con.query(sql, function (err) {
-                                            if(err) {
-                                                WriteLog.throwSQLError(err, "Register.register");
-
-
-                                            }else WriteLog.consoleInfo("Table friend_"+result[0].id+" created", "Register.register");
-                                        });
-                                    con.query("INSERT INTO password (id, mdp) VALUES (?, ?)", [result[0].id, password1], function (err) {
-                                        if(err) {
-                                            WriteLog.throwSQLError(err, "Register.register");
-
-
-                                        }else WriteLog.consoleInfo("New password stocked : "+password1, "Register.register");
-                                    });
-                                }else WriteLog.consoleInfo("ERR_ID_NOT_UNIQUE", "Register.register");
-                            }
-                        });
-                    }
-                });
-            }else{
-                WriteLog.consoleInfo("ERR_NOT_UNIQUE_EMAIL", "Register.register");
-                callback(false, {
-                    type: "warning",
-                    title: "Erreur",
-                    text: "un autre compte utilise déjà cette adresse email"
-                });
+                WriteLog.throwSQLError(err);
+                callback(false, MySQLError.getDisplayableError(err))
+            }else {
+                WriteLog.consoleInfo(`New user registered : ${email}`)
+                callback(true, result[0][0])
             }
         });
     }

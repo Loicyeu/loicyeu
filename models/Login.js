@@ -21,25 +21,19 @@ const MySQLError = require("./MySQLError");
  * @name Login
  * @author Loicyeu
  * @version 1.2.0
- * @copyright Loicyeu 2020
+ * @copyright All right reserved 2020
  */
 class Login {
 
-    constructor(email, password) {
-        this.email = email
-        this.password = password
-    }
-
-
     /**
      * Méthode permettant de savoir si les informations (email, password) sont présentes dans la base de données.
+     * @param {string} email L'adresse email de l'utilisateur
+     * @param {string} password Le mot de passe de l'utilisateur
      * @param {requestedCallback} callback Le callback permettant de retourner la réponse.
      * @since 1.0.0
      * @version 1.2.0
      */
-    exists(callback) {
-        const email = this.email
-        const password = this.password
+    exists(email, password, callback) {
 
         //region VERIFS
         if(email === "" || password === "") {
@@ -70,9 +64,9 @@ class Login {
                 callback(false, MySQLError.getDisplayableError(err));
 
             }else {
-                if(Password.compare(password, result[0].hash)){
-                    WriteLog.consoleInfo(`User(${result[0].id}) found with good email and password`, "Login.exists");
-                    callback(true, result[0]);
+                if(Password.compare(password, result[0][0].hash)){
+                    WriteLog.consoleInfo(`User(${result[0][0].id}) is connected`, "Login.exists");
+                    callback(true, result[0][0]);
                 }else{
                     WriteLog.consoleInfo("ERR_NOT_FOUND_DATA : password", "Login.exists");
                     callback(false, {

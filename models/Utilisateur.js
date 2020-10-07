@@ -1,32 +1,27 @@
+/*
+ * Projet loicyeu
+ * Created by Loicyeu <loic.henry2001@gmail.com>
+ * Copyright (c) 2020.
+ * All rights reserved.
+ */
+
 const con = require('../config/db')
 const WriteLog = require('./WriteLog')
 const Password = require('./Password')
 
 /**
  * Définition du callback
- * @callback requestedCallbackUtilisateur
+ * @callback Utilisateur~requestedCallback
  * @param {*} response
  * @param {Object} error
- */
-
-/**
- * @typedef {Object} row
- * @typedef {number} id
- * @typedef {string} nom
- * @typedef {string} prenom
- * @typedef {number} sexe
- * @typedef {string} hash
- * @typedef {string} password
- * @typedef {string} email
- * @typedef {number} role
  */
 
 /**
  * Classe représentant un Utilisateur dans la base de données
  * @name Utilisateur
  * @author Loicyeu
- * @since 0.1.0
- * @copyright Loicyeu 2020
+ * @version 1.0.0
+ * @copyright All right reserved 2020
  */
 class Utilisateur {
 
@@ -48,7 +43,7 @@ class Utilisateur {
 
     /**
      * Getter retournant le nom de l'utilsateur
-     * @returns {nom}
+     * @returns {string}
      */
     get nom() {
         return this.row.nom
@@ -56,7 +51,7 @@ class Utilisateur {
 
     /**
      * Getter retournant le prenom de l'utilisateur
-     * @returns {prenom}
+     * @returns {string}
      */
     get prenom() {
         return this.row.prenom
@@ -64,7 +59,7 @@ class Utilisateur {
 
     /**
      * Getter retournant le sexe de l'utilisateur
-     * @returns {sexe} 1=Homme, 2=Femme, 3=Autre
+     * @returns {number} 1=Homme, 2=Femme, 3=Autre
      */
     get sexe() {
         return this.row.sexe
@@ -72,7 +67,7 @@ class Utilisateur {
 
     /**
      * Getter retournant le hash de l'utilisateur
-     * @returns {hash}
+     * @returns {string}
      */
     get hash() {
         return this.row.hash
@@ -80,7 +75,7 @@ class Utilisateur {
 
     /**
      * Getter retournant l'email de l'utilisateur
-     * @returns {email}
+     * @returns {string}
      */
     get email() {
         return this.row.email
@@ -88,7 +83,7 @@ class Utilisateur {
 
     /**
      * Getter retournant le role de l'utilisateur
-     * @returns {role} 0=default, 1=VIP, 2=modo, 3=admin
+     * @returns {number} 0=default, 1=VIP, 2=modo, 3=admin
      */
     get role() {
         return this.row.role
@@ -97,14 +92,14 @@ class Utilisateur {
     /**
      * Méthode permattant de créer un utilisateur dans la base de données
      * @static
-     * @since 0.0.1
+     * @since 1.0.0
      * @param {nom} nom le nom de l'utilisateur
      * @param {prenom} prenom le prenom de l'utilisateur
      * @param {sexe} [sexe=null] le sexe de l'utilisateur : 1=Homme, 2=Femme, 3=Autre
      * @param {password} password le mot de passe de l'utilisateur
      * @param {email} email l'email de l'utilisateur
      * @param {role} [role=0] le role de l'utilisateur
-     * @param {requestedCallbackUtilisateur} callback
+     * @param {requestedCallback} callback
      */
     static create(nom, prenom, sexe=null, password, email, role=0, callback) {
         let hash = Password.hash(password)

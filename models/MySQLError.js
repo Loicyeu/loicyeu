@@ -4,13 +4,15 @@
  * Copyright (c) 2020.
  * All rights reserved.
  */
+
 const WriteLog = require('./WriteLog');
 
 /**
  * Classe MySQLError
- * @class MySQLError
+ * @name MySQLError
+ * @author Loicyeu
  * @version 1.0.0
- * @copyright Loicyeu 2020
+ * @copyright All right reserved 2020
  */
 class MySQLError{
 
@@ -32,7 +34,7 @@ class MySQLError{
 
     /**
      * Méthode permettant de récupérer un message d'erreur plus lisible pour chaque erreur MySQL.
-     * @param {*} error L'erreur MySQL
+     * @param {{sqlMessage: string}} error L'erreur MySQL
      * @return {{type:string, title: string, text: string}} Le message d'erreur
      * @since 1.0.0
      * @version 1.0.0
@@ -41,6 +43,8 @@ class MySQLError{
         switch (error.sqlMessage) {
             case "MYSQL_ERR_NO_HASH_FOUND":
                 return {type: "warning", title: "Erreur", text: "adresse email ou mot de passe invalide"}
+            case "MYSQL_ERR_EMAIL_ALREADY_TAKEN":
+                return {type: "warning", title: "Erreur", text: "un autre compte utilise déjà cette adresse email"}
 
             //Unexpected Errors
             case "MYSQL_ERR_TOO_MUCH_HASH":
