@@ -11,10 +11,10 @@ const mysql = require('mysql');
  * @type {Connection} La connection MySQL
  */
 const connection = mysql.createConnection({
-    host: "localhost",
-    user: "loicyeu",
-    password: "123abc+-=",
-    database: "loicyeufr"
+    host: process.env.DBHOST,
+    user: process.env.DBUSER,
+    password: process.env.DBPASSWORD,
+    database: process.env.DBNAME
 });
 
 connection.connect(function(err) {

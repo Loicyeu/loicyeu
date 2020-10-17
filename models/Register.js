@@ -6,9 +6,10 @@
  */
 
 const con = require('./../config/db')
-const WriteLog = require('./WriteLog')
-const Password = require("./Password");
-const MySQLError = require("./MySQLError");
+const WriteLog = require('./Utils/WriteLog')
+const Error = require("./Error/Error");
+const Password = require("./Utils/Password");
+const MySQLError = require("./Error/MySQLError");
 
 /**
  * @callback Register~requestedCallback
@@ -66,7 +67,7 @@ class Register {
             callback(false, {
                 type: "warning",
                 title: "Erreur",
-                text: "le mot de passe est invalide"
+                text: Error.INVALID_PASSWORD
             });
             return;
         }
@@ -75,7 +76,7 @@ class Register {
             callback(false, {
                 type: "warning",
                 title: "Erreur",
-                text: "le mot de passe est invalide"
+                text: Error.INVALID_PASSWORD
             });
             return;
         }
@@ -84,7 +85,7 @@ class Register {
             callback(false, {
                 type: "warning",
                 title: "Erreur",
-                text: "les mots de passes ne sont pas identiques"
+                text: Error.NOT_SAME_PASSWORD
             });
             return;
         }

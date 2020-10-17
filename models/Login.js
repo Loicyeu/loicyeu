@@ -6,9 +6,9 @@
  */
 
 const con = require("./../config/db");
-const WriteLog = require("./WriteLog");
-const Password = require("./Password");
-const MySQLError = require("./MySQLError");
+const WriteLog = require("./Utils/WriteLog");
+const Password = require("./Utils/Password");
+const MySQLError = require("./Error/MySQLError");
 
 /**
  * @callback Login~requestedCallback
@@ -37,7 +37,6 @@ class Login {
 
         //region VERIFS
         if(email === "" || password === "") {
-            WriteLog.consoleInfo("ERR_EMPTY_DATA", "Login.exists");
             callback(false, {
                 type: "warning",
                 title: "Erreur",
@@ -48,7 +47,6 @@ class Login {
 
         const regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
         if(!regexEmail.test(email)) {
-            WriteLog.consoleInfo("ERR_INVALID_DATA", "Login.exists");
             callback(false, {
                 type: "warning",
                 title: "Erreur",
@@ -58,17 +56,13 @@ class Login {
         }
         //endregion VERIFS
 
-        con.query("CALL get_user_hash(?)", [email], function (err, result) {
+        con.query("CALL get_user_hash(?)", [email], function (err, result, fields) {
             if(err) {
-                WriteLog.throwSQLError(err, "Login.exists");
                 callback(false, MySQLError.getDisplayableError(err));
-
             }else {
                 if(Password.compare(password, result[0][0].hash)){
-                    WriteLog.consoleInfo(`User(${result[0][0].id}) is connected`, "Login.exists");
                     callback(true, result[0][0]);
                 }else{
-                    WriteLog.consoleInfo("ERR_NOT_FOUND_DATA : password", "Login.exists");
                     callback(false, {
                         type: "warning",
                         title: "Erreur",

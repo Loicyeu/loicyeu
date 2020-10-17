@@ -5,7 +5,7 @@
  * All rights reserved.
  */
 
-const moment = require('../config/moment')
+const moment = require('../../config/moment')
 const fs = require('fs')
 const logFile = "./log/logServ.log"
 

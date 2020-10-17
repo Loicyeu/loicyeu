@@ -5,14 +5,17 @@
  * All rights reserved.
  */
 
+const Error = require("./Error");
+
 /**
- * Classe URLError
+ * Classe URLError qui hérite de Error
  * @class URLError
+ * @see Error
  * @author Loicyeu
- * @version 1.0.0
+ * @version 1.1.0
  * @copyright All right reserved 2020
  */
-class URLError {
+class URLError extends Error{
 
     /**
      * Méthode permettant de transformer un code d'erreur d'URL en
@@ -30,17 +33,19 @@ class URLError {
             case undefined:
             case "":
                 return null;
+
             case "fileNotFound":
-                return {type: "warning", title: "Erreur", text:"le fichier n'a pas pu être trouvé."}
+                return {type: "warning", title: "Erreur", text: this.FILE_NOT_FOUND}
             case "fileTypeUnsupported":
-                return {type: "warning", title: "Erreur", text:"le fichier sélectionné n'est pas supporté."}
+                return {type: "warning", title: "Erreur", text: this.UNSUPPORTED_FILE_TYPE}
             case "fileTooLarge":
-                return {type: "warning", title: "Erreur", text:"le fichier sélectionné est trop volumineux."}
+                return {type: "warning", title: "Erreur", text: this.FILE_TOO_LARGE}
             case "emptyFiels":
-                return {type: "warning", title: "Erreur", text:"l'un des champs est vide."}
+                return {type: "warning", title: "Erreur", text: this.EMPTY_FIELD}
+
             case "unexpectedError":
             default:
-                return {type: "danger", title:"Alerte", text:"une erreur inattendue s'est produite."}
+                return {type: "danger", title:"Alerte", text: this.UNEXPECTED_ERROR}
         }
     }
 

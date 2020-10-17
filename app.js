@@ -28,15 +28,7 @@ const uuid = require('uuid');
 app.disable('x-powered-by');
 app.set('trust proxy', true);
 
-const {
-    PORT = 3000,
-    IN_PROD = false,//process.env.NODE_ENV==="production",
-
-    SESS_NAME = "loicyeu.fr",
-    SESS_SECRET = '-=-Th3_-_S3cr3et-=-',
-    SESS_LIFETIME = 1000 * 60 * 60 * 2 //TWO HOURS
-} = process.env;
-
+const {PORT, SESS_NAME, SESS_SECRET, SESS_LIFETIME} = process.env;
 const sessionStore = new MySQLStore({}, require('./config/db'));
 //endregion APP CONFIG
 
@@ -54,8 +46,8 @@ app.listen(PORT, () => {
 
 
 //Démarrage log + Erreurs
-const WriteLog = require('./models/WriteLog');
-const URLError = require('./models/URLError');
+const WriteLog = require('./models/Utils/WriteLog');
+const URLError = require('./models/Error/URLError');
 WriteLog.startServ()
 
 //Moteur de template
@@ -71,8 +63,8 @@ app.use(session({
     store: sessionStore,
     proxy: true,
     cookie: {
-        secure: IN_PROD,
-        maxAge: SESS_LIFETIME,
+        secure: false,
+        maxAge: Number(SESS_LIFETIME),
         sameSite: true,
     }
 }));
@@ -96,7 +88,6 @@ app.post('/login', function (req, res) {
             res.redirect("/");
 
         }else {
-            console.log(info)
             res.render('login', {datas: {
                 alertLogin: info
             }});
@@ -160,6 +151,19 @@ app.post('/profil/updateInfo', (req, res) => {
 
     })
 })
+
+app.post('/profil/updatePassword', (req, res) => {
+    const {pass, newPass1, newPass2} = req.body;
+    const Profile = require('./models/Profil');
+
+    Profile.updatePassword(pass, newPass1, newPass2, (response, info)=> {
+        if(response) {
+
+        }else {
+            res.redirect(`/profile?error=`)
+        }
+    });
+})
 //endregion POST REQUEST
 
 //region GET REQUEST
@@ -176,7 +180,6 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/profil', redirectNotLogged, (req, res) => {
-    console.log(req.session)
     const Profil = require("./models/Profil");
 
     Profil.getUserInfo(req.session.userID, (result, info) => {
@@ -187,7 +190,9 @@ app.get('/profil', redirectNotLogged, (req, res) => {
                     error: URLError.getDisplayableError(req.query.error)
             }});
         }else {
-            res.render('profil', {datas: {}});
+            res.render('profil', {datas: {
+                    error: info
+            }});
         }
     });
 

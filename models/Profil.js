@@ -6,7 +6,8 @@
  */
 
 const con = require('../config/db')
-const WriteLog = require("./WriteLog");
+const MySQLError = require("./Error/MySQLError");
+const Error = require("./Error/Error");
 
 /**
  * @callback Profil~requestedCallback
@@ -30,23 +31,21 @@ class Profil {
      */
     static getUserInfo(id, callback) {
 
-        con.query("SELECT * FROM users WHERE id=?", [id],function (err, result) {
+        con.query("CALL get_user(?)", [id],function (err, result) {
             if(err) {
-                WriteLog.consoleInfo("ERR_SQL_ERROR", "Profil.userInfo");
-                callback(false, {err: "unexpectedError"});
+                callback(false, MySQLError.getDisplayableError(err));
             }else {
-                if(result.length===1){
-                    callback(true, result[0]);
-                    WriteLog.consoleInfo("userInfo : id="+ result[0].id + " email="+ result[0].email, "Profil.userInfo");
-                }else if(result.length>1) {
-                    callback(false, {err: "ERR_ID_NOT_UNIQUE"});
-                    WriteLog.consoleInfo("unexpectedError", "Profil.userInfo");
-                }else{
-                    callback(false, {err: "ERR_UNEXPECTED_ERROR"});
-                    WriteLog.consoleInfo("unexpectedError", "Profil.userInfo");
-                }
+                callback(true, result[0][0]);
             }
         });
+    }
+
+    static updatePassword(pass, newPass1, newPass2, callback) {
+        const Password = require("./Utils/Password");
+
+        if(!Password.isValid(newPass1) || newPass1!==newPass2) {
+            callback(false, {type: "warning", title: "Erreur", text: Error.UNEXPECTED_ERROR})
+        }
     }
 }
 
