@@ -1,7 +1,7 @@
 # loicyeu
 
 ## Présentation
-https://www.loicyeu.fr
+http://www.loicyeu.fr
 
 ## Quelques projets réalisés durant mon DUT
 - Un jeu pur CSS : https://savethefish.loicyeu.fr
